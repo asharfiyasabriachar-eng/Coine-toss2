@@ -102,38 +102,51 @@
   <button id="tossBtn" onclick="tossCoin()">Toss Coin</button>
 </div>
 
+let isWaitingForResult = false;
 
-  <script>
-    let playerChoice = "";
+function tossCoin() {
+  if(!playerChoice) {
+      alert("Please choose Head or Tail first!");
+      return;
+  }
+  
+  if(isWaitingForResult) return; // जब तक पुराना रिजल्ट नहीं आता, दोबारा क्लिक न हो
+  isWaitingForResult = true;
+    
+  let coin = document.getElementById("coin");
+  // टॉस शुरू होने पर सिक्का तेजी से घुमाना शुरू करें
+  coin.style.transition = "transform 0.1s linear";
+  
+  // 1. सबसे पहले खिलाड़ी की चॉइस थंकबल को भेजें ताकि गूगल शीट में 'Pending' दर्ज हो जाए
+  let messageData = "Choice," + playerChoice; 
+  if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(messageData);
+  }
+  
+  // स्क्रीन पर दिखाएं कि रिजल्ट का इंतज़ार हो रहा है (यानि एडमिन यानी आपके अप्रूवल का इंतज़ार)
+  document.getElementById("selectedChoice").innerText = playerChoice + " (Waiting for result...)";
+}
 
-function setChoice(choice) {
-  playerChoice = choice;
-    document.getElementById("selectedChoice").innerText = choice;
-      document.getElementById("headBtn").classList.remove("active");
-        document.getElementById("tailBtn").classList.remove("active");
-          
-            if(choice === 'Head') {
-                document.getElementById("headBtn").classList.add("active");
-                  } else {
-                      document.getElementById("tailBtn").classList.add("active");
-                        }
-                        }
+// यह फंक्शन थंकबल से 'Winner' या 'Loser' का मैसेज वापस यहाँ सुनेगा और सिक्का उसी हिसाब से रोकेगा
+document.addEventListener("message", function(event) { handleResult(event.data); });
+window.addEventListener("message", function(event) { handleResult(event.data); });
 
-                        function tossCoin() {
-                          if(!playerChoice) {
-                              alert("Please choose Head or Tail first!");
-                                  return;
-                                    }
-                                      
-                                        let coin = document.getElementById("coin");
-                                          coin.style.transform = "rotateY(720deg)";
-                                            
-                                              setTimeout(() => {
-                                                  coin.style.transform = "none";
-                                                      alert("Waiting for result...");
-                                                        }, 1000);
-                                                        }
-                                                        
+function handleResult(result) {
+  let coin = document.getElementById("coin");
+  coin.style.transition = "transform 1s ease-in-out";
+  
+  if (result === "Winner") {
+      // खिलाड़ी को जिताने के लिए सिक्का सही साइड पर रोकें
+      coin.style.transform = (playerChoice === 'Head') ? "rotateY(0deg)" : "rotateY(180deg)";
+      alert("Congratulations! You WON!");
+  } else if (result === "Loser") {
+      // खिलाड़ी को हराने के लिए सिक्का विपरीत साइड पर रोकें
+      coin.style.transform = (playerChoice === 'Head') ? "rotateY(180deg)" : "rotateY(0deg)";
+      alert("You Lost!");
+  }
+  isWaitingForResult = false;
+}
+
   </script>
 </body>
 </html>
