@@ -161,8 +161,9 @@ function handleResult(result) {
   isWaitingForResult = false;
 }
 
-document.addEventListener("message", function(event) { handleResult(event.data); });
-window.addEventListener("message", function(event) { handleResult(event.data); });
+window.addEventListener('message', function(event) {
+    handleResult(event.data);
+});
 
 </script>
 
