@@ -153,11 +153,13 @@ function handleResult(result) {
   
   if (result === "Winner") {
       coin.style.transform = (playerChoice === 'Head') ? "rotateY(0deg)" : "rotateY(180deg)";
-      document.getElementById("selectedChoice").innerText = "Congratulations! You WON!";
+     
+    document.getElementById("selectedChoice").innerText = "Congratulations! You WON!";
 
   } else if (result === "Loser") {
       coin.style.transform = (playerChoice === 'Head') ? "rotateY(180deg)" : "rotateY(0deg)";
-      document.getElementById("selectedChoice").innerText = "You Lost!";
+    
+    document.getElementById("selectedChoice").innerText = "You Lost!";
 
   isWaitingForResult = false;
 }
