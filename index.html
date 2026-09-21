@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>कॉइन टॉस गेम</title>
+    <title>Coin Toss Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,27 +13,75 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            text-align: center;
         }
-        .container {
+        .card {
             background: #ffffff;
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
             width: 320px;
+            text-align: center;
+        }
+        h2 {
+            margin-top: 0;
+            color: #111;
         }
         .coin {
-            font-size: 70px;
-            margin: 20px 0;
-            transition: transform 0.5s ease;
+            width: 100px;
+            height: 100px;
+            background-color: #ffc107;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            transition: transform 0.6s ease;
         }
-        @keyframes flip {
+        @keyframes spin {
             0% { transform: rotateY(0deg); }
             50% { transform: rotateY(720deg) scale(1.1); }
             100% { transform: rotateY(1440deg); }
         }
-        .flipping {
-            animation: flip 1s ease-in-out;
+        .spinning {
+            animation: spin 1s ease-in-out;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        .action-btn {
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 48%;
+        }
+        .action-btn.active {
+            background-color: #333;
+            color: white;
+        }
+        .toss-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .toss-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
         input[type="text"] {
             width: 90%;
@@ -41,275 +89,199 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
         }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            margin-top: 10px;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .choice-btn {
-            background-color: #007bff;
-            margin: 5px 5px;
-            width: 42%;
-            display: inline-block;
-        }
-        .choice-btn.selected {
-            background-color: #ffc107;
-            color: black;
-            font-weight: bold;
-        }
-        #gameArea, #nameArea {
+        #nameScreen {
             display: none;
         }
-        .choices-container {
-            display: flex;
-            justify-content: space-between;
+        #gameScreen {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- नाम दर्ज करने की स्क्रीन (सिर्फ पहली बार दिखेगी) -->
-        <div id="nameArea">
-            <h2>कॉइन टॉस गेम</h2>
-            <p>कृपया अपना नाम दर्ज करें:</p>
-            <input type="text" id="playerName" placeholder="अपना नाम लिखें">
-            <button onclick="savePlayerName()">आगे बढ़ें</button>
-            <p id="nameMsg" style="color: red; font-size: 14px;"></p>
+    <div class="card">
+        <!-- नाम डालने की स्क्रीन (सिर्फ पहली बार) -->
+        <div id="nameScreen">
+            <h2>Coin Toss Game</h2>
+            <p>अपना नाम दर्ज करें:</p>
+            <input type="text" id="usernameInput" placeholder="नाम लिखें">
+            <button class="toss-btn" onclick="saveName()">शुरू करें</button>
+            <p id="nameError" style="color: red; font-size: 13px;"></p>
         </div>
 
-        <!-- गेम और टॉस स्क्रीन (नाम डालने के बाद हमेशा यही दिखेगी) -->
-        <div id="gameArea">
-            <h2>कॉइन टॉस</h2>
-            <div id="coinElement" class="coin">🪙</div>
-            <p id="instructionText">अपनी पसंद चुनें:</p>
+        <!-- मुख्य गेम स्क्रीन (स्क्रीनशॉट जैसी) -->
+        <div id="gameScreen">
+            <h2>Coin Toss Game</h2>
             
-            <div class="choices-container" id="choiceButtonsContainer">
-                <button class="choice-btn" id="headBtn" onclick="selectChoice('Head')">Head</button>
-                <button class="choice-btn" id="tailBtn" onclick="selectChoice('Tail')">Tail</button>
+            <div class="coin" id="coinDisplay">Head</div>
+
+            <div class="btn-group">
+                <button class="action-btn" id="chooseHeadBtn" onclick="selectChoice('Head')">Choose Head</button>
+                <button class="action-btn" id="chooseTailBtn" onclick="selectChoice('Tail')">Choose Tail</button>
             </div>
 
-            <!-- टॉस्ट बटन -->
-            <button id="tossBtn" onclick="performToss()" style="background-color: #ff5722; display: none;">Toss (टॉस करें)</button>
+            <p id="choiceText" style="font-weight: bold; margin: 15px 0;">Your Choice: None</p>
 
-            <h3 id="statusMessage" style="margin-top: 20px; color: #333;"></h3>
+            <button class="toss-btn" id="tossButton" onclick="startToss()" disabled>Toss Coin</button>
+
+            <p id="statusMsg" style="margin-top: 15px; font-weight: bold; color: #555;"></p>
         </div>
     </div>
 
     <script>
         const scriptURL = "https://script.google.com/macros/s/AKfycbxn6PU66vb9_sbVQ064q4WHi1eCm4P6qS6jVf0o-JxTyXEPWP_MBYH59OYahGZOzf-l_A/exec";
-        let currentName = localStorage.getItem("game_player_name") || "";
-        let selectedOption = "";
-        let checkInterval = null;
+        let playerName = localStorage.getItem("my_game_user") || "";
+        let chosenSide = "";
+        let pollInterval = null;
 
         window.onload = function() {
-            if (currentName.trim() !== "") {
-                // अगर नाम पहले से सेव है, तो नाम वाला बॉक्स बिल्कुल मत दिखाओ, सीधे गेम दिखाओ
-                checkExistingStatus();
+            if (playerName.trim() !== "") {
+                document.getElementById("gameScreen").style.display = "block";
+                checkServerStatus();
             } else {
-                // अगर पहली बार आया है, तो ही नाम वाला बॉक्स दिखाओ
-                document.getElementById("nameArea").style.display = "block";
+                document.getElementById("nameScreen").style.display = "block";
             }
         };
 
-        // सिर्फ पहली बार नाम सेव करने के लिए
-        function savePlayerName() {
-            let nameInput = document.getElementById("playerName").value.trim();
-            if (!nameInput) {
-                document.getElementById("nameMsg").innerText = "कृपया अपना नाम लिखें!";
+        function saveName() {
+            let val = document.getElementById("usernameInput").value.trim();
+            if (!val) {
+                document.getElementById("nameError").innerText = "कृपया नाम लिखें!";
                 return;
             }
+            playerName = val;
+            localStorage.setItem("my_game_user", playerName);
             
-            currentName = nameInput;
-            localStorage.setItem("game_player_name", currentName);
-            document.getElementById("nameMsg").innerText = "कनेक्ट हो रहा है...";
+            document.getElementById("nameScreen").style.display = "none";
+            document.getElementById("gameScreen").style.display = "block";
 
-            fetch(`${scriptURL}?name=` + encodeURIComponent(currentName))
-            .then(res => res.json())
-            .then(data => {
-                if (!data || data.length === 0) {
-                    let newData = {
-                        playerName: currentName,
-                        playerChoice: "",
-                        playerResult: ""
-                    };
-                    return fetch(scriptURL, {
-                        method: "POST",
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify(newData)
-                    });
-                }
-            })
-            .then(() => {
-                checkExistingStatus();
-            })
-            .catch(() => {
-                showGameScreen("", "");
-            });
+            // शीट में नया यूजर जोड़ने के लिए
+            fetch(scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ playerName: playerName, playerChoice: "", playerResult: "" })
+            }).catch(e => {});
         }
 
-        // यूजर का स्टेटस चेक करना
-        function checkExistingStatus() {
-            fetch(`${scriptURL}?name=` + encodeURIComponent(currentName) + `&t=` + new Date().getTime())
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    let user = data[0];
-                    let choice = (user.playerChoice || "").toString().trim();
-                    let result = (user.playerResult || "").toString().trim();
-                    
-                    showGameScreen(choice, result);
-                } else {
-                    showGameScreen("", "");
-                }
-            })
-            .catch(() => {
-                showGameScreen("", "");
-            });
-        }
+        function selectChoice(side) {
+            chosenSide = side;
+            document.getElementById("choiceText").innerText = "Your Choice: " + side;
+            document.getElementById("coinDisplay").innerText = side;
 
-        // गेम स्क्रीन दिखाना (नाम वाला बॉक्स यहाँ कभी नहीं आएगा)
-        function showGameScreen(choice, result) {
-            document.getElementById("nameArea").style.display = "none";
-            document.getElementById("gameArea").style.display = "block";
-
-            let headBtn = document.getElementById("headBtn");
-            let tailBtn = document.getElementById("tailBtn");
-            let tossBtn = document.getElementById("tossBtn");
-            let statusMsg = document.getElementById("statusMessage");
-            let instruction = document.getElementById("instructionText");
-
-            if (result !== "") {
-                headBtn.disabled = true;
-                tailBtn.disabled = true;
-                tossBtn.style.display = "none";
-                instruction.style.display = "none";
-
-                if (result.toLowerCase() === "win") {
-                    statusMsg.innerHTML = "🎉 बधाई हो! आप जीत गए हैं (Win)!";
-                    statusMsg.style.color = "green";
-                } else {
-                    statusMsg.innerHTML = "❌ आप हार गए हैं (Loss)।";
-                    statusMsg.style.color = "red";
-                }
-                if (checkInterval) clearInterval(checkInterval);
-            } 
-            else if (choice !== "") {
-                headBtn.disabled = true;
-                tailBtn.disabled = true;
-                tossBtn.style.display = "none";
-                instruction.style.display = "none";
-                
-                statusMsg.innerHTML = "⏳ Waiting for Result... (कृपया इंतज़ार करें)";
-                statusMsg.style.color = "orange";
-                
-                startPollingResult();
-            } 
-            else {
-                headBtn.disabled = false;
-                tailBtn.disabled = false;
-                tossBtn.style.display = "none";
-                instruction.style.display = "block";
-                statusMsg.innerHTML = "";
-            }
-        }
-
-        // Head या Tail चुनना
-        function selectChoice(choice) {
-            selectedOption = choice;
-            let headBtn = document.getElementById("headBtn");
-            let tailBtn = document.getElementById("tailBtn");
-            let tossBtn = document.getElementById("tossBtn");
-
-            if (choice === "Head") {
-                headBtn.classList.add("selected");
-                tailBtn.classList.remove("selected");
+            if (side === "Head") {
+                document.getElementById("chooseHeadBtn").classList.add("active");
+                document.getElementById("chooseTailBtn").classList.remove("active");
             } else {
-                tailBtn.classList.add("selected");
-                headBtn.classList.remove("selected");
+                document.getElementById("chooseTailBtn").classList.add("active");
+                document.getElementById("chooseHeadBtn").classList.remove("active");
             }
 
-            tossBtn.style.display = "block";
+            // टॉस बटन चालू करें
+            document.getElementById("tossButton").disabled = false;
         }
 
-        // टॉस बटन दबाना
-        function performToss() {
-            if (!selectedOption) return;
+        function startToss() {
+            if (!chosenSide) return;
 
-            let coin = document.getElementById("coinElement");
-            let headBtn = document.getElementById("headBtn");
-            let tailBtn = document.getElementById("tailBtn");
-            let tossBtn = document.getElementById("tossBtn");
-            let statusMsg = document.getElementById("statusMessage");
+            let coin = document.getElementById("coinDisplay");
+            let tossBtn = document.getElementById("tossButton");
+            let headBtn = document.getElementById("chooseHeadBtn");
+            let tailBtn = document.getElementById("chooseTailBtn");
+            let statusMsg = document.getElementById("statusMsg");
 
+            // बटन और विकल्प लॉक करें
+            tossBtn.disabled = true;
             headBtn.disabled = true;
             tailBtn.disabled = true;
-            tossBtn.style.display = "none";
-            document.getElementById("instructionText").style.display = "none";
 
-            coin.classList.add("flipping");
-            statusMsg.innerHTML = "🪙 सिक्का घूम रहा है...";
+            // सिक्का घुमाना शुरू करें
+            coin.classList.add("spinning");
+            statusMsg.innerText = "सिक्का घूम रहा है...";
             statusMsg.style.color = "#007bff";
 
-            let updateData = {
-                playerName: currentName,
-                playerChoice: selectedOption,
+            let payload = {
+                playerName: playerName,
+                playerChoice: chosenSide,
                 playerResult: ""
             };
 
             setTimeout(() => {
-                coin.classList.remove("flipping");
+                coin.classList.remove("spinning");
 
+                // गूगल शीट में चॉइस भेजें
                 fetch(scriptURL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(updateData)
+                    body: JSON.stringify(payload)
                 })
                 .then(() => {
-                    statusMsg.innerHTML = "⏳ Waiting for Result...";
+                    // अब सिर्फ यह लिखा आना चाहिए
+                    statusMsg.innerText = "Waiting for Result...";
                     statusMsg.style.color = "orange";
-                    startPollingResult();
+                    startPolling();
                 })
                 .catch(() => {
-                    statusMsg.innerHTML = "⏳ Waiting for Result...";
+                    statusMsg.innerText = "Waiting for Result...";
                     statusMsg.style.color = "orange";
-                    startPollingResult();
+                    startPolling();
                 });
             }, 1000);
         }
 
-        // रिजल्ट चेक करना
-        function startPollingResult() {
-            if (checkInterval) clearInterval(checkInterval);
+        function checkServerStatus() {
+            fetch(`${scriptURL}?name=` + encodeURIComponent(playerName) + `&t=` + new Date().getTime())
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    let user = data[0];
+                    let resVal = (user.playerResult || "").toString().trim();
+                    let choiceVal = (user.playerChoice || "").toString().trim();
 
-            checkInterval = setInterval(() => {
-                fetch(`${scriptURL}?name=` + encodeURIComponent(currentName) + `&t=` + new Date().getTime())
+                    if (resVal !== "") {
+                        showFinalResult(resVal);
+                    } else if (choiceVal !== "") {
+                        // अगर पहले ही चॉइस दी जा चुकी है और रिजल्ट बाकी है
+                        selectChoice(choiceVal);
+                        document.getElementById("chooseHeadBtn").disabled = true;
+                        document.getElementById("chooseTailBtn").disabled = true;
+                        document.getElementById("tossButton").disabled = true;
+                        document.getElementById("statusMsg").innerText = "Waiting for Result...";
+                        document.getElementById("statusMsg").style.color = "orange";
+                        startPolling();
+                    }
+                }
+            }).catch(e => {});
+        }
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+
+            pollInterval = setInterval(() => {
+                fetch(`${scriptURL}?name=` + encodeURIComponent(playerName) + `&t=` + new Date().getTime())
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.length > 0) {
-                        let user = data[0];
-                        let result = (user.playerResult || "").toString().trim();
-
-                        if (result !== "") {
-                            clearInterval(checkInterval);
-                            showGameScreen(user.playerChoice, result);
+                        let resVal = (data[0].playerResult || "").toString().trim();
+                        if (resVal !== "") {
+                            clearInterval(pollInterval);
+                            showFinalResult(resVal);
                         }
                     }
-                })
-                .catch(e => {});
+                }).catch(e => {});
             }, 3000);
+        }
+
+        function showFinalResult(resVal) {
+            let statusMsg = document.getElementById("statusMsg");
+            if (resVal.toLowerCase() === "win") {
+                statusMsg.innerText = "बधाई हो! आप जीत गए हैं (Win)!";
+                statusMsg.style.color = "green";
+            } else {
+                statusMsg.innerText = "आप हार गए हैं (Loss)।";
+                statusMsg.style.color = "red";
+            }
         }
     </script>
 </body>
