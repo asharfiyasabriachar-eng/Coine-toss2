@@ -1,173 +1,208 @@
 <!DOCTYPE html>
-<html>
-
-<html>
+<html lang="hi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JSFiddle kcpa5gsL</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कॉइन टॉस गेम</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-  <style>
-    body {
-    font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-        text-align: center;
-          padding: 20px;
-          }
-          .game-container {
-            max-width: 300px;
-              margin: auto;
-                background: white;
-                  padding: 20px;
-                    border-radius: 12px;
-                      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                      }
-                      .coin-box {
-                        perspective: 1000px;
-                          margin: 20px auto;
-                            width: 100px;
-                              height: 100px;
-                              }
-                              .coin {
-                                width: 100%;
-                                  height: 100%;
-                                    position: relative;
-                                      transform-style: preserve-3d;
-                                        transition: transform 1s ease-in-out;
-                                        }
-                                        .side {
-                                          position: absolute;
-                                            width: 100%;
-                                              height: 100%;
-                                                border-radius: 50%;
-                                                  background: gold;
-                                                    display: flex;
-                                                      align-items: center;
-                                                        justify-content: center;
-                                                          font-weight: bold;
-                                                            font-size: 16px;
-                                                              border: 3px solid orange;
-                                                                backface-visibility: hidden;
-                                                                }
-                                                                .tails {
-                                                                  transform: rotateY(180deg);
-                                                                    background: silver;
-                                                                      border-color: gray;
-                                                                      }
-                                                                      .choice-buttons button {
-                                                                        padding: 8px 15px;
-                                                                          margin: 5px;
-                                                                            cursor: pointer;
-                                                                              border: none;
-                                                                                border-radius: 5px;
-                                                                                  background: #ddd;
-                                                                                  }
-                                                                                  .choice-buttons button.active {
-                                                                                    background: #007bff;
-                                                                                      color: white;
-                                                                                      }
-                                                                                      #tossBtn {
-                                                                                        margin-top: 15px;
-                                                                                          padding: 10px 20px;
-                                                                                            background: #28a745;
-                                                                                              color: white;
-                                                                                                border: none;
-                                                                                                  border-radius: 5px;
-                                                                                                    font-size: 16px;
-                                                                                                      cursor: pointer;
-                                                                                                        width: 100%;
-                                                                                                        }
-                                                                                                        
-}
-  </style>
+        .screen {
+            display: none;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            text-align: center;
+        }
 
-  
+        .screen.active {
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .choice-btn {
+            background-color: #28a745;
+            margin: 10px 0;
+        }
+
+        .choice-btn:hover {
+            background-color: #218838;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: green;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-  <div class="game-container">
-  <h2>Coin Toss Game</h2>
-  <div class="coin-box">
-    <div id="coin" class="coin">
-      <div class="side heads">Head</div>
-      <div class="side tails">Tail</div>
+
+    <!-- स्क्रीन 1: नाम दर्ज करने के लिए -->
+    <div id="screen1" class="screen active">
+        <h2>कॉइन टॉस गेम</h2>
+        <p>खेलने के लिए अपना नाम दर्ज करें:</p>
+        <input type="text" id="playerNameInput" placeholder="अपना नाम लिखें">
+        <button onclick="startGame()">खेल शुरू करें</button>
+        <p id="msg1" class="error"></p>
     </div>
-  </div>
 
-  <div class="choice-buttons">
-    <button id="headBtn" onclick="setChoice('Head')">Choose Head</button>
-    <button id="tailBtn" onclick="setChoice('Tail')">Choose Tail</button>
-  </div>
+    <!-- स्क्रीन 2: गेम खेलने और रिजल्ट देखने के लिए -->
+    <div id="screen2" class="screen">
+        <h2>नमस्ते, <span id="displayName"></span></h2>
+        <p>अपनी पसंद चुनें:</p>
+        <button class="choice-btn" onclick="makeChoice('Head')">Head (हेड)</button>
+        <button class="choice-btn" onclick="makeChoice('Tail')">Tail (टेल)</button>
+        <p id="gameStatus" class="success"></p>
+    </div>
 
-  <p>Your Choice: <span id="selectedChoice">None</span></p>
-  <button id="tossBtn" onclick="tossCoin()">Toss Coin</button>
-</div>
+    <script>
+        // आपका नया Google Apps Script Web App URL
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxn6PU66vb9_sbVQ064q4WHi1eCm4P6qS6jVf0o-JxTyXEPWP_MBYH59OYahGZOzf-l_A/exec";
 
-<script> 
-let playerChoice = "";
-let isWaitingForResult = false;
+        let playerName = localStorage.getItem("game_player_name") || "";
+        let resultInterval = null;
 
-function setChoice(choice) {
-  playerChoice = choice;
-  document.getElementById("selectedChoice").innerText = choice;
-  document.getElementById("headBtn").classList.remove("active");
-  document.getElementById("tailBtn").classList.remove("active");
-  
-  if(choice === 'Head') {
-      document.getElementById("headBtn").classList.add("active");
-  } else {
-      document.getElementById("tailBtn").classList.add("active");
-  }
-}
+        window.onload = function() {
+            if (playerName && playerName.trim() !== "") {
+                document.getElementById("displayName").innerText = playerName;
+                switchScreen('screen2');
+                startCheckingResult();
+            } else {
+                switchScreen('screen1');
+            }
+        };
 
-function tossCoin() {
-  if(!playerChoice) {
-      alert("Please choose Head or Tail first!");
-      return;
-  }
-  
-  if(isWaitingForResult) return;
-  isWaitingForResult = true;
-    
-  let coin = document.getElementById("coin");
-  coin.style.transition = "transform 0.1s linear";
-  coin.style.transform = "rotateY(720deg)";
-  
-let messageData = playerChoice
-try {
-    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-        window.ReactNativeWebView.postMessage(messageData);
-    } else {
-        window.parent.postMessage(messageData, "*");
-    }
-} catch (e) {
-    console.log(e);
-}
-  
-  
-  document.getElementById("selectedChoice").innerText = playerChoice + " (Waiting for result...)";
-}
+        // नाम सेव करना और शीट में भेजना
+        function startGame() {
+            let inputVal = document.getElementById("playerNameInput").value.trim();
+            
+            if(!inputVal) {
+                document.getElementById("msg1").innerText = "कृपया अपना नाम दर्ज करें!";
+                return;
+            }
 
-function handleResult(result) {
-  let coin = document.getElementById("coin");
-  coin.style.transition = "transform 1s ease-in-out";
-  
-      if (result === "Winner") {
-        coin.style.transform = (playerChoice === 'Head') ? "rotateY(0deg)" : "rotateY(180deg)";
-        document.getElementById("selectedChoice").innerText = "Congratulations! You WON!";
-    } else if (result === "Loser") {
-        coin.style.transform = (playerChoice === 'Head') ? "rotateY(180deg)" : "rotateY(0deg)";
-        document.getElementById("selectedChoice").innerText = "You Lost!";
-    }
+            playerName = inputVal;
+            localStorage.setItem("game_player_name", playerName);
+            document.getElementById("msg1").innerText = "कनेक्ट हो रहा है...";
 
+            let initialData = {
+                playerName: playerName,
+                playerChoice: "",
+                playerResult: ""
+            };
 
-  isWaitingForResult = false;
-}
+            fetch(scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(initialData)
+            })
+            .then(() => {
+                document.getElementById("displayName").innerText = playerName;
+                switchScreen('screen2');
+                startCheckingResult();
+            })
+            .catch(err => {
+                document.getElementById("msg1").innerText = "कनेक्शन में दिक्कत, दोबारा कोशिश करें।";
+            });
+        }
 
-window.addEventListener('message', function(event) {
-    handleResult(event.data);
-});
+        // Head या Tail चुनना
+        function makeChoice(choice) {
+            document.getElementById("gameStatus").innerText = "पसंद (" + choice + ") सेव हो रही है...";
+            
+            let updateData = {
+                playerName: playerName,
+                playerChoice: choice,
+                playerResult: ""
+            };
 
-</script>
+            fetch(scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(updateData)
+            })
+            .then(() => {
+                document.getElementById("gameStatus").innerText = "पसंद सेव हो गई! एडमिन के रिजल्ट का इंतज़ार है...";
+            })
+            .catch(() => {
+                document.getElementById("gameStatus").innerText = "एरर! इंटरनेट चेक करें।";
+            });
+        }
 
+        // लगातार Google Sheet से रिजल्ट चेक करना (Win या Loss)
+        function startCheckingResult() {
+            if (resultInterval) clearInterval(resultInterval);
+
+            resultInterval = setInterval(() => {
+                if (!playerName) return;
+
+                fetch(`${scriptURL}?name=` + encodeURIComponent(playerName) + `&t=` + new Date().getTime())
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        let user = data[0];
+                        let result = (user.playerResult || "").toString().trim().toLowerCase();
+                        let statusEl = document.getElementById("gameStatus");
+
+                        if (result === "win") {
+                            statusEl.innerHTML = "🎉 बधाई हो! आप जीत गए हैं (Win)!";
+                            statusEl.style.color = "green";
+                        } else if (result === "loss") {
+                            statusEl.innerHTML = "❌ आप हार गए हैं (Loss)। अगली बार कोशिश करें!";
+                            statusEl.style.color = "red";
+                        }
+                    }
+                })
+                .catch(e => {});
+            }, 3000); // हर 3 सेकंड में शीट चेक करेगा
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            let target = document.getElementById(screenId);
+            if(target) target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
