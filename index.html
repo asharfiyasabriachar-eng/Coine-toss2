@@ -102,7 +102,7 @@
 <body>
 
     <div class="card">
-        <!-- नाम डालने की स्क्रीन (सिर्फ पहली बार) -->
+        <!-- नाम डालने की स्क्रीन -->
         <div id="nameScreen">
             <h2>Coin Toss Game</h2>
             <p>अपना नाम दर्ज करें:</p>
@@ -111,7 +111,7 @@
             <p id="nameError" style="color: red; font-size: 13px;"></p>
         </div>
 
-        <!-- मुख्य गेम स्क्रीन (स्क्रीनशॉट जैसी) -->
+        <!-- मुख्य गेम स्क्रीन -->
         <div id="gameScreen">
             <h2>Coin Toss Game</h2>
             
@@ -131,7 +131,8 @@
     </div>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxn6PU66vb9_sbVQ064q4WHi1eCm4P6qS6jVf0o-JxTyXEPWP_MBYH59OYahGZOzf-l_A/exec";
+        // आपका नया यूआरएल यहाँ जोड़ दिया गया है
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwHF4INldauI2Awq5VJlyO2RnrN194a0_9ShtgAGdgtuc6tEo2HfK412Lale3XmzCh2xg/exec";
         let playerName = localStorage.getItem("my_game_user") || "";
         let chosenSide = "";
         let pollInterval = null;
@@ -157,7 +158,7 @@
             document.getElementById("nameScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
-            // शीट में नया यूजर जोड़ने के लिए
+            // शीट में नया यूजर भेजने के लिए
             fetch(scriptURL, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -178,7 +179,6 @@
                 document.getElementById("chooseHeadBtn").classList.remove("active");
             }
 
-            // टॉस बटन चालू करें
             document.getElementById("tossButton").disabled = false;
         }
 
@@ -191,12 +191,10 @@
             let tailBtn = document.getElementById("chooseTailBtn");
             let statusMsg = document.getElementById("statusMsg");
 
-            // बटन और विकल्प लॉक करें
             tossBtn.disabled = true;
             headBtn.disabled = true;
             tailBtn.disabled = true;
 
-            // सिक्का घुमाना शुरू करें
             coin.classList.add("spinning");
             statusMsg.innerText = "सिक्का घूम रहा है...";
             statusMsg.style.color = "#007bff";
@@ -210,14 +208,13 @@
             setTimeout(() => {
                 coin.classList.remove("spinning");
 
-                // गूगल शीट में चॉइस भेजें
+                // Google Sheet में डेटा भेजने की रिक्वेस्ट
                 fetch(scriptURL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(payload)
                 })
                 .then(() => {
-                    // अब सिर्फ यह लिखा आना चाहिए
                     statusMsg.innerText = "Waiting for Result...";
                     statusMsg.style.color = "orange";
                     startPolling();
@@ -242,13 +239,13 @@
                     if (resVal !== "") {
                         showFinalResult(resVal);
                     } else if (choiceVal !== "") {
-                        // अगर पहले ही चॉइस दी जा चुकी है और रिजल्ट बाकी है
                         selectChoice(choiceVal);
                         document.getElementById("chooseHeadBtn").disabled = true;
                         document.getElementById("chooseTailBtn").disabled = true;
                         document.getElementById("tossButton").disabled = true;
-                        document.getElementById("statusMsg").innerText = "Waiting for Result...";
-                        document.getElementById("statusMsg").style.color = "orange";
+                        statusMsg = document.getElementById("statusMsg");
+                        statusMsg.innerText = "Waiting for Result...";
+                        statusMsg.style.color = "orange";
                         startPolling();
                     }
                 }
