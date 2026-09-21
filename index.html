@@ -131,8 +131,8 @@
     </div>
 
     <script>
-        // आपका नया यूआरएल यहाँ सेट कर दिया गया है
-        const scriptURL = "https://script.google.com/macros/s/AKfycbzjR0W4bYiWzhUNDUhlccnUT_FPO_Jprx4VpBO85CFUB1CI52k_kXOGRYbLLW2IguUZ8Q/exec";
+        // आपका नया यूआरएल यहाँ जोड़ दिया गया है
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzpF7LTxS1S_YEi7I56E3sWeu-dZ5f8coml7ilUFY_oTOWp_03te9etDpzDOidbn3f7kQ/exec";
         let playerName = localStorage.getItem("my_game_user") || "";
         let chosenSide = "";
         let pollInterval = null;
@@ -270,12 +270,17 @@
 
         function showFinalResult(resVal) {
             let statusMsg = document.getElementById("statusMsg");
-            if (resVal.toLowerCase() === "win") {
-                statusMsg.innerText = "बधाई हो! आप जीत गए हैं (Win)!";
+            let lowerRes = resVal.toLowerCase();
+
+            if (lowerRes === "win") {
+                statusMsg.innerText = "🎉 बधाई हो! आप जीत गए हैं (Win)!";
                 statusMsg.style.color = "green";
-            } else {
-                statusMsg.innerText = "आप हार गए हैं (Loss)।";
+            } else if (lowerRes === "loss") {
+                statusMsg.innerText = "❌ ओह! आप हार गए हैं (Loss)। अगली बार कोशिश करें!";
                 statusMsg.style.color = "red";
+            } else {
+                statusMsg.innerText = "परिणाम: " + resVal;
+                statusMsg.style.color = "#333";
             }
         }
     </script>
