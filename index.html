@@ -45,7 +45,11 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .cup:hover {
+        .cup.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .cup:hover:not(.disabled) {
             background-color: #e94560;
             transform: translateY(-5px);
         }
@@ -64,11 +68,6 @@
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
-        }
-        .action-btn:disabled {
-            background-color: #555;
-            color: #888;
-            cursor: not-allowed;
         }
         input[type="text"] {
             width: 90%;
@@ -109,14 +108,14 @@
             <div class="message-box" id="instructionText">सिक्का ध्यान से देखें...</div>
             
             <div class="cups-container">
-                <div class="cup" id="cup0" onclick="chooseCup(0)">?</div>
-                <div class="cup" id="cup1" onclick="chooseCup(1)">?</div>
-                <div class="cup" id="cup2" onclick="chooseCup(2)">?</div>
-                <div class="cup" id="cup3" onclick="chooseCup(3)">?</div>
+                <div class="cup disabled" id="cup0" onclick="chooseCup(0)">?</div>
+                <div class="cup disabled" id="cup1" onclick="chooseCup(1)">?</div>
+                <div class="cup disabled" id="cup2" onclick="chooseCup(2)">?</div>
+                <div class="cup disabled" id="cup3" onclick="chooseCup(3)">?</div>
             </div>
         </div>
 
-        <!-- रिजल्ट स्क्रीन (दोबारा खेलने के बटन के साथ) -->
+        <!-- रिजल्ट स्क्रीन -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 20px; font-weight: bold; margin: 20px 0;"></p>
@@ -125,7 +124,6 @@
     </div>
 
     <script>
-        // आपका नया और अपडेटेड Apps Script Web URL यहाँ सेट है
         const scriptURL = "https://script.google.com/macros/s/AKfycbwNPNzL1pZLz8ZbgRCBpfgQPdVVVaYyu3bNccTLYnNYk6J0_g_Kvp9Jm0AMzWCema_JpA/exec";
         
         let playerName = "";
@@ -139,6 +137,7 @@
                 return;
             }
             playerName = val;
+            document.getElementById("nameError").innerText = "";
             document.getElementById("nameScreen").style.display = "none";
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
@@ -150,24 +149,31 @@
             document.getElementById("cup" + winningCup).innerText = "🪙";
             document.getElementById("instructionText").innerText = "सिक्का इस कप में है! याद रखें...";
 
+            // 2 सेकंड बाद सिक्का छिपाकर हेयर-फेर शुरू होगा
             setTimeout(() => {
                 document.getElementById("cup" + winningCup).innerText = "?";
-                document.getElementById("instructionText").innerText = "हेयर-फेर शुरू हो रहा है... ध्यान दें!";
+                document.getElementById("instructionText").innerText = "हेयर-फेर हो रहा है... ध्यान दें!";
                 
                 let shuffleCount = 0;
                 let shuffleInterval = setInterval(() => {
                     let randomFake = Math.floor(Math.random() * 4);
-                    document.querySelectorAll('.cup').forEach(c => c.style.borderColor = "#e94560");
+                    document.querySelectorAll('.cup').forEach(c => {
+                        c.style.borderColor = "#e94560";
+                        c.classList.add('disabled'); // हेयर-फेर के दौरान क्लिक बंद रखना
+                    });
                     document.getElementById("cup" + randomFake).style.borderColor = "#4ecca3";
                     
                     shuffleCount++;
-                    if (shuffleCount > 8) {
+                    if (shuffleCount > 10) { // हेयर-फेर पूरा होने का समय
                         clearInterval(shuffleInterval);
-                        document.querySelectorAll('.cup').forEach(c => c.style.borderColor = "#e94560");
-                        document.getElementById("instructionText").innerText = "सिक्का किस बॉक्स में है? चुनें!";
-                        gameActive = true;
+                        document.querySelectorAll('.cup').forEach(c => {
+                            c.style.borderColor = "#e94560";
+                            c.classList.remove('disabled'); // अब यूजर क्लिक कर सकता है
+                        });
+                        document.getElementById("instructionText").innerText = "अब सही बॉक्स चुनें!";
+                        gameActive = true; // क्लिक करने की अनुमति अब मिलेगी
                     }
-                }, 300);
+                }, 250);
 
             }, 2000);
         }
@@ -178,13 +184,17 @@
                 let c = document.getElementById("cup" + i);
                 c.innerText = "?";
                 c.classList.remove('reveal');
+                c.classList.add('disabled');
                 c.style.borderColor = "#e94560";
             }
         }
 
         function chooseCup(selectedCup) {
-            if (!gameActive) return;
-            gameActive = false;
+            if (!gameActive) return; // अगर गेम एक्टिव नहीं है तो क्लिक काम नहीं करेगा
+            gameActive = false; // दोबारा क्लिक रोकने के लिए
+
+            // सभी कप लॉक कर दें ताकि क्लिक न हो सके
+            document.querySelectorAll('.cup').forEach(c => c.classList.add('disabled'));
 
             for(let i=0; i<4; i++) {
                 if (i === winningCup) {
