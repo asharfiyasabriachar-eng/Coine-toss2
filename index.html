@@ -3,98 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic Coin Shuffle - Pro Game</title>
+    <title>Water Leap Adventure - Final Game</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #1e3799, #0984e3, #74b9ff);
             color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
         .card {
-            background: rgba(22, 33, 62, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 35px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 25px;
             border-radius: 20px;
-            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.6);
-            width: 380px;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.7);
+            width: 400px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
         h2 { 
             margin-top: 0; 
-            color: #ffcc00; 
-            font-size: 26px;
+            color: #f1c40f; 
+            font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(255, 204, 0, 0.3);
         }
-        p { color: #b2bec3; font-size: 15px; }
+        p { color: #b2bec3; font-size: 14px; }
         
-        /* खूबसूरत 3D बॉक्स डिजाइन */
-        .cups-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 35px 0;
-        }
-        .cup {
-            width: 70px;
-            height: 85px;
-            background: linear-gradient(145deg, #2b3a67, #1d284f);
-            border: 2px solid #ff4757;
+        /* गेम एरेना और पानी का लुक */
+        .game-arena {
+            background: linear-gradient(to bottom, #74b9ff, #0984e3);
+            border: 3px solid #dfe6e9;
             border-radius: 12px;
+            height: 220px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+        }
+        
+        /* सीढ़ियाँ */
+        .stairs-container {
             display: flex;
-            flex-direction: column;
+            justify-content: space-around;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+        .stair {
+            width: 70px;
+            height: 35px;
+            background: #e17055;
+            border: 2px solid #d63031;
+            border-radius: 8px;
+            display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .cup::after {
-            content: 'BOX';
-            font-size: 10px;
-            color: #ff4757;
+            font-size: 13px;
             font-weight: bold;
-            margin-top: 5px;
-            letter-spacing: 1px;
-        }
-        .cup.disabled {
-            cursor: not-allowed;
-            opacity: 0.8;
-        }
-        .cup:hover:not(.disabled) {
-            background: linear-gradient(145deg, #ff4757, #ff6b81);
-            border-color: #fff;
-            transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(255, 71, 87, 0.4);
-        }
-        .cup:hover:not(.disabled)::after {
             color: #fff;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transition: 0.2s;
         }
-        .cup.reveal {
-            background: linear-gradient(145deg, #e1b12c, #fbc531);
-            border-color: #fff;
-            box-shadow: 0 0 20px #fbc531;
+        .stair:hover {
+            transform: scale(1.05);
+            background: #fab1a0;
+        }
+
+        /* कूदने वाला कैरेक्टर */
+        #character {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            transition: 0.25s ease-out;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
         }
 
         .action-btn {
             background: linear-gradient(135deg, #00b894, #55efc4);
             color: #0f0c29;
             border: none;
-            padding: 14px 20px;
-            font-size: 17px;
+            padding: 12px 20px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 15px;
+            margin-top: 10px;
             box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
             transition: 0.2s;
         }
@@ -116,152 +129,170 @@
         }
         #gameScreen, #resultScreen { display: none; }
         .message-box {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
-            margin: 15px 0;
-            color: #f1c40f;
-            min-height: 28px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            margin: 10px 0;
+            color: #ffeaa7;
+            min-height: 22px;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- नाम दर्ज करने की स्क्रीन -->
+        <!-- नाम और कैरेक्टर चयन स्क्रीन -->
         <div id="nameScreen">
-            <h2>Magic Coin Pro</h2>
-            <p>खजाने के बॉक्स में छिपा सिक्का ढूंढें और जीतें!</p>
+            <h2>Water Leap Adventure</h2>
+            <p>सीढ़ियों पर चढ़ें, डायनेमिक स्कोर पाकर 15 तक पहुँचें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
-            <button class="action-btn" onclick="startShuffleRound()">गेम शुरू करें</button>
+            
+            <div style="margin: 10px 0;">
+                <label style="font-size: 14px; color: #dfe6e9;">कैरेक्टर चुनें:</label><br>
+                <select id="charSelect" style="padding: 8px; width: 60%; margin-top: 5px; border-radius: 5px; background: #111827; color: #fff; border: 1px solid #00b894;">
+                    <option value="🐒">बंदर (Monkey)</option>
+                    <option value="🦊">लोमड़ी (Fox)</option>
+                </select>
+            </div>
+
+            <button class="action-btn" onclick="startGame()">गेम शुरू करें</button>
             <p id="nameError" style="color: #ff6b6b; font-size: 13px;"></p>
         </div>
 
         <!-- गेम खेलने की स्क्रीन -->
         <div id="gameScreen">
-            <h2>म्यूजिक शफल</h2>
-            <div class="message-box" id="instructionText">सिक्का दिखाया जा रहा है...</div>
+            <div class="stats-bar">
+                <span>⏱️ टाइम: <span id="timerText">60</span>s</span>
+                <span>🏆 स्कोर: <span id="scoreText">0</span>/15</span>
+            </div>
+
+            <div class="message-box" id="instructionText">सही सीढ़ी पर छलांग लगाएँ!</div>
             
-            <div class="cups-container">
-                <div class="cup disabled" id="cup0" onclick="chooseCup(0)">🎁</div>
-                <div class="cup disabled" id="cup1" onclick="chooseCup(1)">🎁</div>
-                <div class="cup disabled" id="cup2" onclick="chooseCup(2)">🎁</div>
-                <div class="cup disabled" id="cup3" onclick="chooseCup(3)">🎁</div>
+            <div class="game-arena">
+                <div id="character">🐒</div>
+                <div class="stairs-container">
+                    <div class="stair" onclick="jumpToStair(0)">सीढ़ी 1</div>
+                    <div class="stair" onclick="jumpToStair(1)">सीढ़ी 2</div>
+                    <div class="stair" onclick="jumpToStair(2)">सीढ़ी 3</div>
+                    <div class="stair" onclick="jumpToStair(3)">सीढ़ी 4</div>
+                </div>
             </div>
         </div>
 
         <!-- रिजल्ट स्क्रीन -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
-            <p id="finalResultMsg" style="font-size: 20px; font-weight: bold; margin: 20px 0;"></p>
+            <p id="finalResultMsg" style="font-size: 18px; font-weight: bold; margin: 15px 0;"></p>
             <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
         </div>
     </div>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwNPNzL1pZLz8ZbgRCBpfgQPdVVVaYyu3bNccTLYnNYk6J0_g_Kvp9Jm0AMzWCema_JpA/exec";
+        // आपका नया जोड़ा गया गूगल ऐप्स स्क्रिप्ट URL
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwKr3-nGqxHtODqv-gf5Hx_MtwmXgHL03Cw5RxUCHgFUw1n_W02SOtixct5Qa01RqnO5w/exec";
         
         let playerName = "";
-        let winningCup = -1;
+        let selectedEmoji = "🐒";
+        let score = 0;
+        let targetScore = 15; // फिक्स स्कोर टारगेट 15
+        let timeLeft = 60; // 1 मिनट का टाइमर
+        let timerInterval = null;
         let gameActive = false;
+        let safeStair = 0;
 
-        function startShuffleRound() {
+        function startGame() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
-                document.getElementById("nameError").innerText = "कृपया सही नाम लिखें!";
+                document.getElementById("nameError").innerText = "कृपया अपना नाम लिखें!";
                 return;
             }
             playerName = val;
+            selectedEmoji = document.getElementById("charSelect").value;
+            document.getElementById("character").innerText = selectedEmoji;
+            document.getElementById("character").style.bottom = "60px";
+
             document.getElementById("nameError").innerText = "";
             document.getElementById("nameScreen").style.display = "none";
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
-            resetBoxes();
+            score = 0;
+            timeLeft = 60;
+            document.getElementById("scoreText").innerText = score;
+            document.getElementById("timerText").innerText = timeLeft;
             
-            // शुरुआत में एक रैंडम बॉक्स में सिक्का दिखाएं
-            winningCup = Math.floor(Math.random() * 4);
-            document.getElementById("cup" + winningCup).innerText = "🪙";
-            document.getElementById("instructionText").innerText = "सिक्का इस बॉक्स में है! याद रखें...";
+            gameActive = true;
+            nextStep();
 
-            // 2 सेकंड बाद सिक्का छिप जाएगा और शफलिंग शुरू होगी
-            setTimeout(() => {
-                document.getElementById("cup" + winningCup).innerText = "🎁";
-                document.getElementById("instructionText").innerText = "बॉक्स आपस में बदल रहे हैं... ध्यान दें!";
-                
-                let shuffleCount = 0;
-                let shuffleInterval = setInterval(() => {
-                    let possibleNewPos = Math.floor(Math.random() * 4);
-                    winningCup = possibleNewPos; // सिक्का घूमकर नई पोजीशन पर जा रहा है
-
-                    let randomGlow = Math.floor(Math.random() * 4);
-                    document.querySelectorAll('.cup').forEach(c => {
-                        c.style.borderColor = "#ff4757";
-                        c.classList.add('disabled');
-                    });
-                    document.getElementById("cup" + randomGlow).style.borderColor = "#00b894";
-                    
-                    shuffleCount++;
-                    if (shuffleCount > 12) {
-                        clearInterval(shuffleInterval);
-                        document.querySelectorAll('.cup').forEach(c => {
-                            c.style.borderColor = "#ff4757";
-                            c.classList.remove('disabled');
-                        });
-                        document.getElementById("instructionText").innerText = "सिक्का किस बॉक्स में है? चुनें!";
-                        gameActive = true; 
-                    }
-                }, 250);
-
-            }, 2000);
-        }
-
-        function resetBoxes() {
-            gameActive = false;
-            for(let i=0; i<4; i++) {
-                let c = document.getElementById("cup" + i);
-                c.innerText = "🎁";
-                c.classList.remove('reveal');
-                c.classList.add('disabled');
-                c.style.borderColor = "#ff4757";
-            }
-        }
-
-        function chooseCup(selectedCup) {
-            if (!gameActive) return; 
-            gameActive = false; 
-
-            document.querySelectorAll('.cup').forEach(c => c.classList.add('disabled'));
-
-            for(let i=0; i<4; i++) {
-                if (i === winningCup) {
-                    document.getElementById("cup" + i).innerText = "🪙";
-                    document.getElementById("cup" + i).classList.add('reveal');
-                } else {
-                    document.getElementById("cup" + i).innerText = "❌";
+            // 1 मिनट का टाइमर चालू करें
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timerText").innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame("Loss", "⏰ समय समाप्त हो गया! आप हार गए।");
                 }
-            }
+            }, 1000);
+        }
 
-            let resultStatus = (selectedCup === winningCup) ? "Winner" : "Loss";
+        function nextStep() {
+            if (!gameActive) return;
+            safeStair = Math.floor(Math.random() * 4);
+            document.getElementById("instructionText").innerText = "अगली सीढ़ी चुनें! पानी से बचें।";
+        }
 
-            if (resultStatus === "Winner") {
-                document.getElementById("instructionText").innerText = "🎉 सही जवाब! आप जीत गए!";
-                document.getElementById("instructionText").style.color = "#55efc4";
+        function jumpToStair(chosenStair) {
+            if (!gameActive) return;
+
+            let positions = ["15%", "38%", "62%", "85%"];
+            document.getElementById("character").style.left = positions[chosenStair];
+
+            if (chosenStair === safeStair) {
+                // डाइनेमिक स्कोर: हर सही सीढ़ी पर 1 से 4 के बीच रैंडम अंक जुड़ेंगे
+                let earnedPoints = Math.floor(Math.random() * 4) + 1; 
+                score += earnedPoints;
+                
+                if (score > targetScore) score = targetScore;
+
+                document.getElementById("scoreText").innerText = score;
+                document.getElementById("instructionText").innerText = `✨ शानदार! +${earnedPoints} स्कोर मिला!`;
+                
+                if (score >= targetScore) {
+                    clearInterval(timerInterval);
+                    gameActive = false;
+                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट पूरा कर लिया और जीत गए!");
+                } else {
+                    setTimeout(nextStep, 400);
+                }
             } else {
-                document.getElementById("instructionText").innerText = "❌ गलत बॉक्स! आप हार गए!";
-                document.getElementById("instructionText").style.color = "#ff6b6b";
+                // गलत सीढ़ी - पानी में गिर गया! गेम ओवर
+                clearInterval(timerInterval);
+                gameActive = false;
+                
+                document.getElementById("character").style.bottom = "10px";
+                document.getElementById("character").innerText = "🌊";
+                
+                setTimeout(() => {
+                    endGame("Loss", "💦 ओह नो! आप पानी में गिर गए! गेम ओवर।");
+                }, 700);
+            }
+        }
+
+        function endGame(status, msg) {
+            gameActive = false;
+            document.getElementById("gameScreen").style.display = "none";
+            document.getElementById("resultScreen").style.display = "block";
+            document.getElementById("finalResultMsg").innerText = msg;
+            
+            if (status === "Winner") {
+                document.getElementById("finalResultMsg").style.color = "#55efc4";
+            } else {
+                document.getElementById("finalResultMsg").style.color = "#ff6b6b";
             }
 
-            setTimeout(() => {
-                sendDataToServer(resultStatus);
-            }, 2000);
+            sendDataToServer(status);
         }
 
         function sendDataToServer(resultStatus) {
-            document.getElementById("gameScreen").style.display = "none";
-            document.getElementById("resultScreen").style.display = "block";
-            document.getElementById("finalResultMsg").innerText = "डेटा सेव हो रहा है...";
-
             let payload = {
                 playerName: playerName,
                 result: resultStatus
@@ -273,30 +304,12 @@
                 body: JSON.stringify(payload)
             })
             .then(res => res.json())
-            .then(data => {
-                if (data.result === "Winner") {
-                    document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
-                    document.getElementById("finalResultMsg").style.color = "#55efc4";
-                } else {
-                    document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)। अगली बार कोशिश करें!";
-                    document.getElementById("finalResultMsg").style.color = "#ff6b6b";
-                }
-            })
-            .catch(err => {
-                if (resultStatus === "Winner") {
-                    document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
-                    document.getElementById("finalResultMsg").style.color = "#55efc4";
-                } else {
-                    document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)।";
-                    document.getElementById("finalResultMsg").style.color = "#ff6b6b";
-                }
-            });
+            .catch(err => console.log("Data sync error"));
         }
 
         function restartGame() {
             document.getElementById("resultScreen").style.display = "none";
-            document.getElementById("gameScreen").style.display = "block";
-            startShuffleRound();
+            document.getElementById("nameScreen").style.display = "block";
         }
     </script>
 </body>
