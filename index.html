@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Grid Challenge - 1 Min</title>
+    <title>Coin Shuffling Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,43 +17,43 @@
         }
         .card {
             background: #16213e;
-            padding: 25px;
+            padding: 30px;
             border-radius: 15px;
             box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.5);
-            width: 340px;
+            width: 360px;
             text-align: center;
         }
         h2 { margin-top: 0; color: #e94560; }
-        .timer-box {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ff6b6b;
-            margin: 8px 0;
+        p { color: #ccc; font-size: 14px; }
+        
+        /* 4 कप/बॉक्स की डिजाइन */
+        .cups-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
         }
-        .score-box {
-            font-size: 18px;
-            color: #4ecca3;
-            margin: 8px 0;
-        }
-        /* 3x3 Grid बनावट */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .cell {
+        .cup {
+            width: 65px;
+            height: 65px;
             background-color: #0f3460;
-            height: 70px;
+            border: 2px solid #e94560;
             border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: 0.3s;
         }
-        .cell.active {
+        .cup:hover {
             background-color: #e94560;
-            box-shadow: 0 0 15px #e94560;
+            transform: translateY(-5px);
         }
-        .start-btn {
+        .cup.reveal {
+            background-color: #f39c12;
+        }
+
+        .action-btn {
             background-color: #4ecca3;
             color: #1a1a2e;
             border: none;
@@ -65,7 +65,7 @@
             width: 100%;
             margin-top: 10px;
         }
-        .start-btn:disabled {
+        .action-btn:disabled {
             background-color: #555;
             color: #888;
             cursor: not-allowed;
@@ -73,7 +73,7 @@
         input[type="text"] {
             width: 90%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 15px 0;
             border: 1px solid #4ecca3;
             background: #0f3460;
             color: #fff;
@@ -82,6 +82,13 @@
             font-size: 16px;
         }
         #gameScreen, #resultScreen { display: none; }
+        .message-box {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #f39c12;
+            min-height: 25px;
+        }
     </style>
 </head>
 <body>
@@ -89,56 +96,43 @@
     <div class="card">
         <!-- नाम दर्ज करने की स्क्रीन -->
         <div id="nameScreen">
-            <h2>Grid Challenge</h2>
-            <p>1 मिनट में 150 स्कोर बनाएं!<br><small style="color: #ff6b6b;">सावधान: गलत क्लिक पर पॉइंट्स कटेंगे!</small></p>
+            <h2>Coin Shuffle Game</h2>
+            <p>सिक्के को पहचानें और जीतें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
-            <button class="start-btn" onclick="startGame()">गेम शुरू करें</button>
+            <button class="action-btn" onclick="startShuffleRound()">गेम शुरू करें</button>
             <p id="nameError" style="color: #ff6b6b; font-size: 13px;"></p>
         </div>
 
         <!-- गेम खेलने की स्क्रीन -->
         <div id="gameScreen">
-            <h2>Fast Grid</h2>
-            <div class="timer-box">समय शेष: <span id="timer">60</span>s</div>
-            <div class="score-box">स्कोर: <span id="currentScore">0</span></div>
+            <h2>हेयर-फेर (Shuffle)</h2>
+            <div class="message-box" id="instructionText">सिक्का ध्यान से देखें...</div>
             
-            <!-- 9 बॉक्स का ग्रिड -->
-            <div class="grid" id="gridContainer">
-                <div class="cell" onclick="cellClicked(0)"></div>
-                <div class="cell" onclick="cellClicked(1)"></div>
-                <div class="cell" onclick="cellClicked(2)"></div>
-                <div class="cell" onclick="cellClicked(3)"></div>
-                <div class="cell" onclick="cellClicked(4)"></div>
-                <div class="cell" onclick="cellClicked(5)"></div>
-                <div class="cell" onclick="cellClicked(6)"></div>
-                <div class="cell" onclick="cellClicked(7)"></div>
-                <div class="cell" onclick="cellClicked(8)"></div>
+            <div class="cups-container">
+                <div class="cup" id="cup0" onclick="chooseCup(0)">?</div>
+                <div class="cup" id="cup1" onclick="chooseCup(1)">?</div>
+                <div class="cup" id="cup2" onclick="chooseCup(2)">?</div>
+                <div class="cup" id="cup3" onclick="chooseCup(3)">?</div>
             </div>
-
-            <p style="font-size: 12px; color: #aaa;">चमकते हुए लाल बॉक्स पर ही क्लिक करें!</p>
         </div>
 
-        <!-- रिजल्ट स्क्रीन -->
+        <!-- रिजल्ट स्क्रीन (दोबारा खेलने के बटन के साथ) -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
-            <p id="finalScoreText" style="font-size: 18px; font-weight: bold;"></p>
             <p id="finalResultMsg" style="font-size: 20px; font-weight: bold; margin: 20px 0;"></p>
+            <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
         </div>
     </div>
 
     <script>
         // आपका नया और अपडेटेड Apps Script Web URL यहाँ सेट है
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwFwb01T8GA8hVK_H8lw3XMXjkY6HBjnzWZE1jccyRPgIGtWBwXeRHX3oMCuYxH69Gksg/exec";
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwNPNzL1pZLz8ZbgRCBpfgQPdVVVaYyu3bNccTLYnNYk6J0_g_Kvp9Jm0AMzWCema_JpA/exec";
         
         let playerName = "";
-        let score = 0;
-        let timeLeft = 60;
-        let timerInterval = null;
+        let winningCup = -1;
         let gameActive = false;
-        let activeIndex = -1;
-        let boxInterval = null;
 
-        function startGame() {
+        function startShuffleRound() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
                 document.getElementById("nameError").innerText = "कृपया सही नाम लिखें!";
@@ -146,73 +140,84 @@
             }
             playerName = val;
             document.getElementById("nameScreen").style.display = "none";
+            document.getElementById("resultScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
-            score = 0;
-            timeLeft = 60;
-            gameActive = true;
-            document.getElementById("currentScore").innerText = score;
-            document.getElementById("timer").innerText = timeLeft;
-
-            // 1 मिनट का टाइमर
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById("timer").innerText = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    clearInterval(boxInterval);
-                    endGame();
-                }
-            }, 1000);
-
-            // हर 0.8 सेकंड में लाल बॉक्स बदलेगा
-            boxInterval = setInterval(lightRandomBox, 800);
-        }
-
-        function lightRandomBox() {
-            if (!gameActive) return;
-            let cells = document.querySelectorAll('.cell');
+            resetCups();
             
-            if (activeIndex >= 0) {
-                cells[activeIndex].classList.remove('active');
-            }
+            winningCup = Math.floor(Math.random() * 4);
+            
+            document.getElementById("cup" + winningCup).innerText = "🪙";
+            document.getElementById("instructionText").innerText = "सिक्का इस कप में है! याद रखें...";
 
-            activeIndex = Math.floor(Math.random() * 9);
-            cells[activeIndex].classList.add('active');
+            setTimeout(() => {
+                document.getElementById("cup" + winningCup).innerText = "?";
+                document.getElementById("instructionText").innerText = "हेयर-फेर शुरू हो रहा है... ध्यान दें!";
+                
+                let shuffleCount = 0;
+                let shuffleInterval = setInterval(() => {
+                    let randomFake = Math.floor(Math.random() * 4);
+                    document.querySelectorAll('.cup').forEach(c => c.style.borderColor = "#e94560");
+                    document.getElementById("cup" + randomFake).style.borderColor = "#4ecca3";
+                    
+                    shuffleCount++;
+                    if (shuffleCount > 8) {
+                        clearInterval(shuffleInterval);
+                        document.querySelectorAll('.cup').forEach(c => c.style.borderColor = "#e94560");
+                        document.getElementById("instructionText").innerText = "सिक्का किस बॉक्स में है? चुनें!";
+                        gameActive = true;
+                    }
+                }, 300);
+
+            }, 2000);
         }
 
-        function cellClicked(index) {
-            if (!gameActive) return;
-            let cells = document.querySelectorAll('.cell');
-
-            if (index === activeIndex) {
-                // सही क्लिक पर अंक मिलें
-                score += 10;
-                cells[activeIndex].classList.remove('active');
-                activeIndex = -1;
-            } else {
-                // गलत क्लिक पर सीधे माइनस पॉइंट कटेंगे
-                score -= 15;
-            }
-            document.getElementById("currentScore").innerText = score;
-        }
-
-        function endGame() {
+        function resetCups() {
             gameActive = false;
-            if (activeIndex >= 0) {
-                document.querySelectorAll('.cell')[activeIndex].classList.remove('active');
+            for(let i=0; i<4; i++) {
+                let c = document.getElementById("cup" + i);
+                c.innerText = "?";
+                c.classList.remove('reveal');
+                c.style.borderColor = "#e94560";
+            }
+        }
+
+        function chooseCup(selectedCup) {
+            if (!gameActive) return;
+            gameActive = false;
+
+            for(let i=0; i<4; i++) {
+                if (i === winningCup) {
+                    document.getElementById("cup" + i).innerText = "🪙";
+                    document.getElementById("cup" + i).classList.add('reveal');
+                } else {
+                    document.getElementById("cup" + i).innerText = "❌";
+                }
             }
 
+            let resultStatus = (selectedCup === winningCup) ? "Winner" : "Loss";
+
+            if (resultStatus === "Winner") {
+                document.getElementById("instructionText").innerText = "🎉 सही जवाब! आप जीत गए!";
+                document.getElementById("instructionText").style.color = "#4ecca3";
+            } else {
+                document.getElementById("instructionText").innerText = "❌ गलत बॉक्स! आप हार गए!";
+                document.getElementById("instructionText").style.color = "#ff6b6b";
+            }
+
+            setTimeout(() => {
+                sendDataToServer(resultStatus);
+            }, 2000);
+        }
+
+        function sendDataToServer(resultStatus) {
             document.getElementById("gameScreen").style.display = "none";
             document.getElementById("resultScreen").style.display = "block";
-
-            document.getElementById("finalScoreText").innerText = "कुल स्कोर: " + score;
             document.getElementById("finalResultMsg").innerText = "डेटा सेव हो रहा है...";
 
             let payload = {
                 playerName: playerName,
-                score: score
+                result: resultStatus
             };
 
             fetch(scriptURL, {
@@ -223,22 +228,28 @@
             .then(res => res.json())
             .then(data => {
                 if (data.result === "Winner") {
-                    document.getElementById("finalResultMsg").innerText = "🎉 शानदार! आप जीत गए (Winner)!";
+                    document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
                     document.getElementById("finalResultMsg").style.color = "#4ecca3";
                 } else {
-                    document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)। टारगेट कठिन था!";
+                    document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)। अगली बार कोशिश करें!";
                     document.getElementById("finalResultMsg").style.color = "#ff6b6b";
                 }
             })
             .catch(err => {
-                if (score >= 150) {
-                    document.getElementById("finalResultMsg").innerText = "🎉 शानदार! आप जीत गए (Winner)!";
+                if (resultStatus === "Winner") {
+                    document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
                     document.getElementById("finalResultMsg").style.color = "#4ecca3";
                 } else {
                     document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)।";
                     document.getElementById("finalResultMsg").style.color = "#ff6b6b";
                 }
             });
+        }
+
+        function restartGame() {
+            document.getElementById("resultScreen").style.display = "none";
+            document.getElementById("gameScreen").style.display = "block";
+            startShuffleRound();
         }
     </script>
 </body>
