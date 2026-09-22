@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Shuffling Game</title>
+    <title>Magic Coin Shuffle - Pro Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #fff;
             display: flex;
             justify-content: center;
@@ -16,77 +16,112 @@
             margin: 0;
         }
         .card {
-            background: #16213e;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.5);
-            width: 360px;
+            background: rgba(22, 33, 62, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.6);
+            width: 380px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        h2 { margin-top: 0; color: #e94560; }
-        p { color: #ccc; font-size: 14px; }
+        h2 { 
+            margin-top: 0; 
+            color: #ffcc00; 
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(255, 204, 0, 0.3);
+        }
+        p { color: #b2bec3; font-size: 15px; }
         
-        /* 4 कप/बॉक्स की डिजाइन */
+        /* खूबसूरत 3D बॉक्स डिजाइन */
         .cups-container {
             display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
+            justify-content: space-between;
+            margin: 35px 0;
         }
         .cup {
-            width: 65px;
-            height: 65px;
-            background-color: #0f3460;
-            border: 2px solid #e94560;
-            border-radius: 10px;
+            width: 70px;
+            height: 85px;
+            background: linear-gradient(145deg, #2b3a67, #1d284f);
+            border: 2px solid #ff4757;
+            border-radius: 12px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
-            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .cup::after {
+            content: 'BOX';
+            font-size: 10px;
+            color: #ff4757;
+            font-weight: bold;
+            margin-top: 5px;
+            letter-spacing: 1px;
         }
         .cup.disabled {
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.8;
         }
         .cup:hover:not(.disabled) {
-            background-color: #e94560;
-            transform: translateY(-5px);
+            background: linear-gradient(145deg, #ff4757, #ff6b81);
+            border-color: #fff;
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(255, 71, 87, 0.4);
+        }
+        .cup:hover:not(.disabled)::after {
+            color: #fff;
         }
         .cup.reveal {
-            background-color: #f39c12;
+            background: linear-gradient(145deg, #e1b12c, #fbc531);
+            border-color: #fff;
+            box-shadow: 0 0 20px #fbc531;
         }
 
         .action-btn {
-            background-color: #4ecca3;
-            color: #1a1a2e;
+            background: linear-gradient(135deg, #00b894, #55efc4);
+            color: #0f0c29;
             border: none;
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 14px 20px;
+            font-size: 17px;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+            transition: 0.2s;
+        }
+        .action-btn:hover {
+            transform: scale(1.02);
+            opacity: 0.95;
         }
         input[type="text"] {
             width: 90%;
-            padding: 10px;
+            padding: 12px;
             margin: 15px 0;
-            border: 1px solid #4ecca3;
-            background: #0f3460;
+            border: 2px solid #00b894;
+            background: #111827;
             color: #fff;
-            border-radius: 5px;
+            border-radius: 8px;
             text-align: center;
             font-size: 16px;
+            outline: none;
         }
         #gameScreen, #resultScreen { display: none; }
         .message-box {
             font-size: 18px;
             font-weight: bold;
             margin: 15px 0;
-            color: #f39c12;
-            min-height: 25px;
+            color: #f1c40f;
+            min-height: 28px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -95,8 +130,8 @@
     <div class="card">
         <!-- नाम दर्ज करने की स्क्रीन -->
         <div id="nameScreen">
-            <h2>Coin Shuffle Game</h2>
-            <p>सिक्के को पहचानें और जीतें!</p>
+            <h2>Magic Coin Pro</h2>
+            <p>खजाने के बॉक्स में छिपा सिक्का ढूंढें और जीतें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             <button class="action-btn" onclick="startShuffleRound()">गेम शुरू करें</button>
             <p id="nameError" style="color: #ff6b6b; font-size: 13px;"></p>
@@ -104,14 +139,14 @@
 
         <!-- गेम खेलने की स्क्रीन -->
         <div id="gameScreen">
-            <h2>हेयर-फेर (Shuffle)</h2>
-            <div class="message-box" id="instructionText">सिक्का ध्यान से देखें...</div>
+            <h2>म्यूजिक शफल</h2>
+            <div class="message-box" id="instructionText">सिक्का दिखाया जा रहा है...</div>
             
             <div class="cups-container">
-                <div class="cup disabled" id="cup0" onclick="chooseCup(0)">?</div>
-                <div class="cup disabled" id="cup1" onclick="chooseCup(1)">?</div>
-                <div class="cup disabled" id="cup2" onclick="chooseCup(2)">?</div>
-                <div class="cup disabled" id="cup3" onclick="chooseCup(3)">?</div>
+                <div class="cup disabled" id="cup0" onclick="chooseCup(0)">🎁</div>
+                <div class="cup disabled" id="cup1" onclick="chooseCup(1)">🎁</div>
+                <div class="cup disabled" id="cup2" onclick="chooseCup(2)">🎁</div>
+                <div class="cup disabled" id="cup3" onclick="chooseCup(3)">🎁</div>
             </div>
         </div>
 
@@ -142,58 +177,60 @@
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
-            resetCups();
+            resetBoxes();
             
+            // शुरुआत में एक रैंडम बॉक्स में सिक्का दिखाएं
             winningCup = Math.floor(Math.random() * 4);
-            
             document.getElementById("cup" + winningCup).innerText = "🪙";
-            document.getElementById("instructionText").innerText = "सिक्का इस कप में है! याद रखें...";
+            document.getElementById("instructionText").innerText = "सिक्का इस बॉक्स में है! याद रखें...";
 
-            // 2 सेकंड बाद सिक्का छिपाकर हेयर-फेर शुरू होगा
+            // 2 सेकंड बाद सिक्का छिप जाएगा और शफलिंग शुरू होगी
             setTimeout(() => {
-                document.getElementById("cup" + winningCup).innerText = "?";
-                document.getElementById("instructionText").innerText = "हेयर-फेर हो रहा है... ध्यान दें!";
+                document.getElementById("cup" + winningCup).innerText = "🎁";
+                document.getElementById("instructionText").innerText = "बॉक्स आपस में बदल रहे हैं... ध्यान दें!";
                 
                 let shuffleCount = 0;
                 let shuffleInterval = setInterval(() => {
-                    let randomFake = Math.floor(Math.random() * 4);
+                    let possibleNewPos = Math.floor(Math.random() * 4);
+                    winningCup = possibleNewPos; // सिक्का घूमकर नई पोजीशन पर जा रहा है
+
+                    let randomGlow = Math.floor(Math.random() * 4);
                     document.querySelectorAll('.cup').forEach(c => {
-                        c.style.borderColor = "#e94560";
-                        c.classList.add('disabled'); // हेयर-फेर के दौरान क्लिक बंद रखना
+                        c.style.borderColor = "#ff4757";
+                        c.classList.add('disabled');
                     });
-                    document.getElementById("cup" + randomFake).style.borderColor = "#4ecca3";
+                    document.getElementById("cup" + randomGlow).style.borderColor = "#00b894";
                     
                     shuffleCount++;
-                    if (shuffleCount > 10) { // हेयर-फेर पूरा होने का समय
+                    if (shuffleCount > 12) {
                         clearInterval(shuffleInterval);
                         document.querySelectorAll('.cup').forEach(c => {
-                            c.style.borderColor = "#e94560";
-                            c.classList.remove('disabled'); // अब यूजर क्लिक कर सकता है
+                            c.style.borderColor = "#ff4757";
+                            c.classList.remove('disabled');
                         });
-                        document.getElementById("instructionText").innerText = "अब सही बॉक्स चुनें!";
-                        gameActive = true; // क्लिक करने की अनुमति अब मिलेगी
+                        document.getElementById("instructionText").innerText = "सिक्का किस बॉक्स में है? चुनें!";
+                        gameActive = true; 
                     }
                 }, 250);
 
             }, 2000);
         }
 
-        function resetCups() {
+        function resetBoxes() {
             gameActive = false;
             for(let i=0; i<4; i++) {
                 let c = document.getElementById("cup" + i);
-                c.innerText = "?";
+                c.innerText = "🎁";
                 c.classList.remove('reveal');
                 c.classList.add('disabled');
-                c.style.borderColor = "#e94560";
+                c.style.borderColor = "#ff4757";
             }
         }
 
         function chooseCup(selectedCup) {
-            if (!gameActive) return; // अगर गेम एक्टिव नहीं है तो क्लिक काम नहीं करेगा
-            gameActive = false; // दोबारा क्लिक रोकने के लिए
+            if (!gameActive) return; 
+            gameActive = false; 
 
-            // सभी कप लॉक कर दें ताकि क्लिक न हो सके
             document.querySelectorAll('.cup').forEach(c => c.classList.add('disabled'));
 
             for(let i=0; i<4; i++) {
@@ -209,7 +246,7 @@
 
             if (resultStatus === "Winner") {
                 document.getElementById("instructionText").innerText = "🎉 सही जवाब! आप जीत गए!";
-                document.getElementById("instructionText").style.color = "#4ecca3";
+                document.getElementById("instructionText").style.color = "#55efc4";
             } else {
                 document.getElementById("instructionText").innerText = "❌ गलत बॉक्स! आप हार गए!";
                 document.getElementById("instructionText").style.color = "#ff6b6b";
@@ -239,7 +276,7 @@
             .then(data => {
                 if (data.result === "Winner") {
                     document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
-                    document.getElementById("finalResultMsg").style.color = "#4ecca3";
+                    document.getElementById("finalResultMsg").style.color = "#55efc4";
                 } else {
                     document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)। अगली बार कोशिश करें!";
                     document.getElementById("finalResultMsg").style.color = "#ff6b6b";
@@ -248,7 +285,7 @@
             .catch(err => {
                 if (resultStatus === "Winner") {
                     document.getElementById("finalResultMsg").innerText = "🎉 बधाई हो! आप जीत गए (Winner)!";
-                    document.getElementById("finalResultMsg").style.color = "#4ecca3";
+                    document.getElementById("finalResultMsg").style.color = "#55efc4";
                 } else {
                     document.getElementById("finalResultMsg").innerText = "❌ आप हार गए (Loss)।";
                     document.getElementById("finalResultMsg").style.color = "#ff6b6b";
