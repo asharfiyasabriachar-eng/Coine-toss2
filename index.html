@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mine Island - Game</title>
+    <title>Mine Island - Game & Wallet</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,6 +24,20 @@
             width: 360px;
             text-align: center;
             border: 3px solid #facc15;
+            position: relative;
+        }
+        .wallet-icon {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            background: #facc15;
+            color: #020617;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         h2 { 
             margin-top: 0; 
@@ -95,11 +109,14 @@
             width: 100%;
             margin-top: 8px;
             box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
-            transition: 0.2s;
         }
         .jump-btn {
             background: linear-gradient(135deg, #f97316, #ea580c);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+        .back-btn {
+            background: #64748b;
+            margin-top: 6px;
         }
         input[type="text"] {
             width: 85%;
@@ -123,7 +140,7 @@
             border: 2px solid #facc15;
             font-size: 14px;
         }
-        #gameScreen, #resultScreen { display: none; }
+        #gameScreen, #resultScreen, #walletScreen { display: none; }
         .message-box {
             font-size: 13px;
             font-weight: bold;
@@ -134,14 +151,25 @@
             padding: 5px;
             border-radius: 6px;
         }
+        .wallet-box {
+            background: rgba(255,255,255,0.08);
+            padding: 12px;
+            border-radius: 12px;
+            margin: 8px 0;
+            border: 1px dashed #facc15;
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
+        <!-- वॉलेट आइकॉन (नाम वाली स्क्रीन पर ऊपर दिखेगा) -->
+        <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट</div>
+
+        <!-- 1. नाम और कैरेक्टर स्क्रीन -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
-            <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, फिक्स टारगेट पूरा करें!</p>
+            <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
             <div style="margin: 8px 0;">
@@ -156,6 +184,7 @@
             <p id="nameError" style="color: #f87171; font-size: 11px; margin-top: 5px;"></p>
         </div>
 
+        <!-- 2. गेम स्क्रीन -->
         <div id="gameScreen">
             <div class="stats-bar">
                 <span>⏱️ टाइम: <span id="timerText">60</span>s</span>
@@ -176,29 +205,46 @@
             <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
+        <!-- 3. रिजल्ट स्क्रीन -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 15px; font-weight: bold; margin: 12px 0;"></p>
             <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
         </div>
+
+        <!-- 4. वॉलेट और विथड्रॉल स्क्रीन -->
+        <div id="walletScreen">
+            <h2>माय वॉलेट 💰</h2>
+            <div class="wallet-box">
+                <p style="margin: 3px 0; font-size: 13px; color: #94a3b8;">खिलाड़ी: <span id="walletUser" style="color:#fff; font-weight:bold;">-</span></p>
+                <p style="margin: 3px 0; font-size: 13px;">कुल उपलब्ध बैलेंस:</p>
+                <h3 style="color: #4ade80; margin: 5px 0; font-size: 24px;">₹ <span id="walletBalance">0</span></h3>
+            </div>
+
+            <input type="text" id="upiInput" placeholder="अपनी UPI ID दर्ज करें (उदा: paytm@ybl)">
+            <button class="action-btn" onclick="requestWithdrawal()">बैंक में भेजें (Withdraw)</button>
+            <p id="withdrawMsg" style="font-size: 12px; margin-top: 6px;"></p>
+
+            <button class="action-btn back-btn" onclick="closeWallet()">वापस जाएं</button>
+        </div>
     </div>
 
-    <!-- Google Sheet में डेटा भेजने के लिए गुप्त फॉर्म -->
+    <!-- डेटा भेजने के लिए फॉर्म -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbxRKS1yfB4JoiXZeNrm1CNBe7o5nUqGH0mpoce-UFTQz5LWUXBo9vIrYI7crp9xlTN2KA/exec" method="POST" target="hidden_iframe" style="display:none;">
+    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbwus4PA0cMmrZUPwADuI5HMGn8s9E-rQELMW5Q2NiaaUjtd_oMGQ_qA3NkeLEbRxmPN/exec" method="POST" target="hidden_iframe" style="display:none;">
         <input type="text" name="playerName" id="formPlayerName">
         <input type="text" name="score" id="formScore">
         <input type="text" name="result" id="formResult">
+        <input type="text" name="amount" id="formAmount">
+        <input type="text" name="upi" id="formUpi">
     </form>
 
     <script>
+        let scriptURL = "https://script.google.com/macros/s/AKfycbwus4PA0cMmrZUPwADuI5HMGn8s9E-rQELMW5Q2NiaaUjtd_oMGQ_qA3NkeLEbRxmPN/exec";
         let playerName = "";
         let selectedEmoji = "🦘";
         let score = 0;
-        
-        // 👉 यहाँ से आप जब चाहें फिक्स स्कोर बदल सकते हैं (जैसे 20, 30 या कुछ भी)
         let targetScore = 30; 
-        
         document.getElementById("displayTarget").innerText = targetScore;
 
         let timeLeft = 60; 
@@ -218,11 +264,65 @@
 
             document.getElementById("nameError").innerText = "";
             document.getElementById("nameScreen").style.display = "none";
-            document.getElementById("resultScreen").style.display = "none";
+            document.getElementById("walletScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
             resetGameState();
             startTimer();
+        }
+
+        function openWallet() {
+            let val = document.getElementById("usernameInput").value.trim();
+            if (!val) {
+                alert("कृपया पहले अपना नाम दर्ज करें!");
+                return;
+            }
+            playerName = val;
+            document.getElementById("walletUser").innerText = playerName;
+            document.getElementById("nameScreen").style.display = "none";
+            document.getElementById("walletScreen").style.display = "block";
+            document.getElementById("walletBalance").innerText = "लोड हो रहा है...";
+
+            // गूगल शीट से कॉलम E का बैलेंस फेच करना
+            fetch(scriptURL + "?playerName=" + encodeURIComponent(playerName))
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("walletBalance").innerText = data.balance;
+                })
+                .catch(err => {
+                    document.getElementById("walletBalance").innerText = "0";
+                });
+        }
+
+        function closeWallet() {
+            document.getElementById("walletScreen").style.display = "none";
+            document.getElementById("nameScreen").style.display = "block";
+        }
+
+        function requestWithdrawal() {
+            let upiId = document.getElementById("upiInput").value.trim();
+            let currentBal = parseFloat(document.getElementById("walletBalance").innerText) || 0;
+            
+            if (!upiId) {
+                document.getElementById("withdrawMsg").style.color = "#f87171";
+                document.getElementById("withdrawMsg").innerText = "कृपया सही UPI ID लिखें!";
+                return;
+            }
+            if (currentBal <= 0) {
+                document.getElementById("withdrawMsg").style.color = "#f87171";
+                document.getElementById("withdrawMsg").innerText = "विथड्रॉल के लिए बैलेंस नहीं है!";
+                return;
+            }
+
+            document.getElementById("withdrawMsg").style.color = "#4ade80";
+            document.getElementById("withdrawMsg").innerText = "सफलतापूर्वक विथड्रॉल अनुरोध भेज दिया गया है!";
+            
+            document.getElementById("formPlayerName").value = playerName;
+            document.getElementById("formScore").value = "";
+            document.getElementById("formResult").value = "Withdrawal";
+            document.getElementById("formAmount5").value = "-" + currentBal; 
+            document.getElementById("formUpi").value = upiId;
+            document.getElementById("dataForm").submit();
         }
 
         function startTimer() {
@@ -257,12 +357,11 @@
             let isSlip = Math.random() < 0.25; 
 
             if (!isSlip) {
-                let earned = Math.floor(Math.random() * 3) + 1; // कभी 1, कभी 2, कभी 3 स्कोर
+                let earned = Math.floor(Math.random() * 3) + 1; 
                 score += earned;
                 if (score > targetScore) score = targetScore;
 
                 document.getElementById("scoreText").innerText = score;
-                
                 currentPos += 6.5;
                 if (currentPos > 210) currentPos = 210;
                 document.getElementById("character").style.bottom = currentPos + "px";
@@ -272,7 +371,7 @@
                 if (score >= targetScore) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Winner", `🎉 बधाई हो! आपने फिक्स ${targetScore} स्कोर का टारगेट जीत लिया!`);
+                    endGame("Winner", `🎉 बधाई हो! आपने ${targetScore} स्कोर का टारगेट जीत लिया!`);
                 }
             } else {
                 clearInterval(timerInterval);
@@ -281,7 +380,7 @@
                 document.getElementById("character").style.bottom = "10px";
                 document.getElementById("character").innerText = "🌊";
                 document.getElementById("instructionText").style.color = "#f87171";
-                document.getElementById("instructionText").innerText = "💦 पैर फिसल गया! पानी में गिरे, गेम रीसेट हो रहा है...";
+                document.getElementById("instructionText").innerText = "💦 पैर फिसल गया! पानी में गिरे...";
 
                 sendDataToServer("Loss");
 
@@ -311,6 +410,8 @@
             document.getElementById("formPlayerName").value = playerName;
             document.getElementById("formScore").value = score; 
             document.getElementById("formResult").value = resultStatus; 
+            document.getElementById("formAmount").value = "0"; 
+            document.getElementById("formUpi").value = "";
             document.getElementById("dataForm").submit();
         }
 
