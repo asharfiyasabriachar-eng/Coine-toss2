@@ -34,7 +34,7 @@
             text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
         }
         
-        /* स्क्रीनशॉट जैसा बीच और पानी का एरेना */
+        /* स्क्रीनशॉट जैसा बीच और पानी का बैकग्राउंड एरेना */
         .game-arena {
             background: linear-gradient(to bottom, #4aa3df 45%, #e1b12c 45%);
             border: 3px solid #f1c40f;
@@ -46,7 +46,6 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* स्क्रीनशॉट जैसे 10x, 50x, 100x लेवल्स */
         .island-steps {
             position: absolute;
             width: 100%;
@@ -139,7 +138,6 @@
         }
         #gameScreen, #resultScreen { display: none; }
         
-        /* सिर्फ स्क्रीन के अंदर दिखने वाला मैसेज बॉक्स */
         .message-box {
             font-size: 14px;
             font-weight: bold;
@@ -158,7 +156,7 @@
         <!-- नाम और कैरेक्टर चयन स्क्रीन -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
-            <p>समुद्र तट पर चढ़ाई करें, 15 स्कोर पूरा करें!</p>
+            <p>समुद्र तट पर चढ़ाई करें, फिक्स 15 स्कोर पूरा करें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
             <div style="margin: 8px 0;">
@@ -180,14 +178,13 @@
                 <span>🏆 स्कोर: <span id="scoreText">0</span>/15</span>
             </div>
 
-            <!-- यहाँ स्क्रीन के अंदर ही सारे मैसेज दिखेंगे -->
             <div class="message-box" id="instructionText">बटन दबाकर छलांग लगाएं!</div>
             
             <div class="game-arena">
                 <div class="island-steps">
-                    <span class="step-badge">100x (स्तर 3)</span>
-                    <span class="step-badge">50x (स्तर 2)</span>
-                    <span class="step-badge">10x (स्तर 1)</span>
+                    <span class="step-badge">12 स्कोर (स्तर 3)</span>
+                    <span class="step-badge">8 स्कोर (स्तर 2)</span>
+                    <span class="step-badge">4 स्कोर (स्तर 1)</span>
                 </div>
                 <div id="character">🦘</div>
             </div>
@@ -209,7 +206,7 @@
         let playerName = "";
         let selectedEmoji = "🦘";
         let score = 0;
-        let targetScore = 15; 
+        let targetScore = 15; // यहाँ से आप फिक्स स्कोर बदल सकते हैं (जैसे 20 करना हो तो 20 लिख लें)
         let timeLeft = 60; 
         let timerInterval = null;
         let gameActive = false;
@@ -281,10 +278,9 @@
                 if (score >= targetScore) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट जीत लिया!");
+                    endGame("Winner", `🎉 बधाई हो! आपने फिक्स ${targetScore} स्कोर का टारगेट जीत लिया!`);
                 }
             } else {
-                // पैर फिसल गया -> पानी में गिर गया -> बिना किसी पॉप-अप के सिर्फ स्क्रीन के अंदर मैसेज और रीसेट
                 clearInterval(timerInterval);
                 gameActive = false;
 
@@ -295,7 +291,6 @@
 
                 sendDataToServer("Loss");
 
-                // 1.5 सेकंड बाद चुपचाप गेम शुरुआत से दोबारा चालू हो जाएगा
                 setTimeout(() => {
                     resetGameState();
                     startTimer();
