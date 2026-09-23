@@ -141,7 +141,7 @@
     <div class="card">
         <div id="nameScreen">
             <h2>Mine Island</h2>
-            <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, फिक्स 20 स्कोर पूरा करें!</p>
+            <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, फिक्स 30 स्कोर पूरा करें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
             <div style="margin: 8px 0;">
@@ -159,7 +159,7 @@
         <div id="gameScreen">
             <div class="stats-bar">
                 <span>⏱️ टाइम: <span id="timerText">60</span>s</span>
-                <span>🏆 स्कोर: <span id="scoreText">0</span>/20</span>
+                <span>🏆 स्कोर: <span id="scoreText">0</span>/30</span>
             </div>
 
             <div class="message-box" id="instructionText">बटन दबाकर छलांग लगाएं!</div>
@@ -183,7 +183,7 @@
         </div>
     </div>
 
-    <!-- Google Sheet में डेटा भेजने के लिए गुप्त फॉर्म (Hidden Form) -->
+    <!-- Google Sheet में डेटा भेजने के लिए गुप्त फॉर्म -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
     <form id="dataForm" action="https://script.google.com/macros/s/AKfycbyWDaUcB6-DK68dSa81tq0O9XhM_nRJXKJpWajYCEoP24OiHz83X8kuOUVkooNhD6hUkw/exec" method="POST" target="hidden_iframe" style="display:none;">
         <input type="text" name="playerName" id="formPlayerName">
@@ -194,7 +194,7 @@
         let playerName = "";
         let selectedEmoji = "🦘";
         let score = 0;
-        let targetScore = 20; 
+        let targetScore = 30; // टारगेट बदलकर 30 कर दिया गया है
         let timeLeft = 60; 
         let timerInterval = null;
         let gameActive = false;
@@ -257,7 +257,8 @@
 
                 document.getElementById("scoreText").innerText = score;
                 
-                currentPos += 12;
+                // 30 स्कोर के हिसाब से ऊंचाई को थोड़ा और बेहतर एडजस्ट किया गया है
+                currentPos += 6.5;
                 if (currentPos > 210) currentPos = 210;
                 document.getElementById("character").style.bottom = currentPos + "px";
                 document.getElementById("instructionText").style.color = "#4ade80";
