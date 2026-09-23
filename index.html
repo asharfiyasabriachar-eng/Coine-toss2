@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mine Island - Ultimate Game</title>
+    <title>Mine Island - Game</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,8 +32,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
-        /* असली स्क्रीनशॉट जैसा बीच और समुद्र का बैकग्राउंड एरेना[span_4](start_span)[span_4](end_span) */
         .game-arena {
             background: linear-gradient(to bottom, #38bdf8 45%, #eab308 45%);
             border: 3px solid #facc15;
@@ -44,8 +42,6 @@
             overflow: hidden;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
         }
-        
-        /* स्क्रीनशॉट की तरह स्टेप्स वाले बैज[span_5](start_span)[span_5](end_span) */
         .island-steps {
             position: absolute;
             width: 100%;
@@ -67,8 +63,6 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.3);
             border: 2px solid #ea580c;
         }
-
-        /* कैरेक्टर */
         #character {
             position: absolute;
             bottom: 15px;
@@ -78,7 +72,6 @@
             transition: bottom 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 10;
         }
-
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -90,7 +83,6 @@
             margin-bottom: 8px;
             color: #facc15;
         }
-
         .action-btn {
             background: linear-gradient(135deg, #38bdf8, #0284c7);
             color: #fff;
@@ -105,14 +97,10 @@
             box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
             transition: 0.2s;
         }
-        .action-btn:hover {
-            transform: translateY(-2px);
-        }
         .jump-btn {
             background: linear-gradient(135deg, #f97316, #ea580c);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
-        
         input[type="text"] {
             width: 85%;
             padding: 10px;
@@ -136,7 +124,6 @@
             font-size: 14px;
         }
         #gameScreen, #resultScreen { display: none; }
-        
         .message-box {
             font-size: 13px;
             font-weight: bold;
@@ -152,7 +139,6 @@
 <body>
 
     <div class="card">
-        <!-- नाम और कैरेक्टर चयन स्क्रीन -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, फिक्स 20 स्कोर पूरा करें!</p>
@@ -170,7 +156,6 @@
             <p id="nameError" style="color: #f87171; font-size: 11px; margin-top: 5px;"></p>
         </div>
 
-        <!-- गेम खेलने की स्क्रीन -->
         <div id="gameScreen">
             <div class="stats-bar">
                 <span>⏱️ टाइम: <span id="timerText">60</span>s</span>
@@ -180,11 +165,10 @@
             <div class="message-box" id="instructionText">बटन दबाकर छलांग लगाएं!</div>
             
             <div class="game-arena">
-                <!-- स्क्रीनशॉट की तरह सीढ़ियों वाले लेवल्स (स्टेप्स)[span_6](start_span)[span_6](end_span) -->
                 <div class="island-steps">
-                    <span class="step-badge">स्तर 3 (उच्च छलांग)</span>
-                    <span class="step-badge">स्तर 2 (मध्यम छलांग)</span>
-                    <span class="step-badge">स्तर 1 (शुरुआत)</span>
+                    <span class="step-badge">स्तर 3</span>
+                    <span class="step-badge">स्तर 2</span>
+                    <span class="step-badge">स्तर 1</span>
                 </div>
                 <div id="character">🦘</div>
             </div>
@@ -192,7 +176,6 @@
             <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
-        <!-- रिजल्ट स्क्रीन -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 15px; font-weight: bold; margin: 12px 0;"></p>
@@ -201,12 +184,13 @@
     </div>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwKr3-nGqxHtODqv-gf5Hx_MtwmXgHL03Cw5RxUCHgFUw1n_W02SOtixct5Qa01RqnO5w/exec";
+        // आपका नया डिप्लॉय किया हुआ Google Apps Script URL यहाँ सेट है
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwsOJAhxSsoPZ8ziesGdt-MSsSDoWCVGUbQjYf9pOoVW2Fesh84yW0Fj2-5j6XezfnYDQ/exec";
         
         let playerName = "";
         let selectedEmoji = "🦘";
         let score = 0;
-        let targetScore = 20; // फिक्स स्कोर 20
+        let targetScore = 20; 
         let timeLeft = 60; 
         let timerInterval = null;
         let gameActive = false;
@@ -260,11 +244,10 @@
         function jumpAction() {
             if (!gameActive) return;
 
-            // 25% चांस पानी में फिसलने का
             let isSlip = Math.random() < 0.25; 
 
             if (!isSlip) {
-                // यहाँ रैंडम स्कोर (1, 2 या 3) जुड़ रहा है जैसा आपने कहा
+                // कभी 1, कभी 2, कभी 3 स्कोर जुड़ने वाला लॉजिक
                 let earned = Math.floor(Math.random() * 3) + 1;
                 score += earned;
                 if (score > targetScore) score = targetScore;
@@ -283,7 +266,6 @@
                     endGame("Winner", `🎉 बधाई हो! आपने फिक्स ${targetScore} स्कोर का टारगेट जीत लिया!`);
                 }
             } else {
-                // पानी में पैर फिसलने पर बिना पॉप-अप के स्क्रीन के अंदर मैसेज और रीसेट
                 clearInterval(timerInterval);
                 gameActive = false;
 
@@ -324,11 +306,12 @@
 
             fetch(scriptURL, {
                 method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
-            .catch(err => console.log("Data sync error"));
+            .then(() => console.log("Data sent successfully"))
+            .catch(err => console.log("Data sync error", err));
         }
 
         function restartGame() {
