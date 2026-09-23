@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Water Leap Adventure - Final Game</title>
+    <title>Mine Island - Game</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,82 +19,78 @@
         .card {
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(12px);
-            padding: 25px;
+            padding: 20px;
             border-radius: 20px;
-            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.7);
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.8);
             width: 400px;
             text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.15);
+            border: 3px solid #f1c40f;
         }
         h2 { 
             margin-top: 0; 
             color: #f1c40f; 
-            font-size: 24px;
+            font-size: 26px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
         }
-        p { color: #b2bec3; font-size: 14px; }
         
-        /* गेम एरेना और पानी का लुक */
+        /* स्क्रीनशॉट जैसा बीच और पानी का लुक */
         .game-arena {
-            background: linear-gradient(to bottom, #74b9ff, #0984e3);
-            border: 3px solid #dfe6e9;
+            background: linear-gradient(to bottom, #74b9ff 45%, #e1b12c 45%);
+            border: 3px solid #f1c40f;
             border-radius: 12px;
-            height: 220px;
+            height: 270px;
             position: relative;
-            margin: 20px 0;
+            margin: 15px 0;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.5);
         }
         
-        /* सीढ़ियाँ */
-        .stairs-container {
-            display: flex;
-            justify-content: space-around;
+        /* स्क्रीनशॉट जैसे मल्टीप्लायर स्टेप्स (10x, 50x, 100x) */
+        .island-steps {
             position: absolute;
-            bottom: 20px;
             width: 100%;
-        }
-        .stair {
-            width: 70px;
-            height: 35px;
-            background: #e17055;
-            border: 2px solid #d63031;
-            border-radius: 8px;
+            height: 100%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-            transition: 0.2s;
+            pointer-events: none;
+            padding: 10px 0;
         }
-        .stair:hover {
-            transform: scale(1.05);
-            background: #fab1a0;
+        .step-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3436;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid #e17055;
         }
 
-        /* कूदने वाला कैरेक्टर */
+        /* कैरेक्टर */
         #character {
             position: absolute;
-            bottom: 60px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 36px;
-            transition: 0.25s ease-out;
+            transition: bottom 0.25s ease-out;
+            z-index: 10;
         }
 
         .stats-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
+            padding: 8px 12px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            color: #f1c40f;
         }
 
         .action-btn {
@@ -107,7 +103,7 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 8px;
             box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
             transition: 0.2s;
         }
@@ -115,25 +111,31 @@
             transform: scale(1.02);
             opacity: 0.95;
         }
+        .jump-btn {
+            background: linear-gradient(135deg, #e17055, #fab1a0);
+            color: #fff;
+            font-size: 18px;
+            padding: 14px;
+        }
         input[type="text"] {
             width: 90%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #00b894;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #f1c40f;
             background: #111827;
             color: #fff;
             border-radius: 8px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             outline: none;
         }
         #gameScreen, #resultScreen { display: none; }
         .message-box {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 5px 0;
             color: #ffeaa7;
-            min-height: 22px;
+            min-height: 20px;
         }
     </style>
 </head>
@@ -142,20 +144,20 @@
     <div class="card">
         <!-- नाम और कैरेक्टर चयन स्क्रीन -->
         <div id="nameScreen">
-            <h2>Water Leap Adventure</h2>
-            <p>सीढ़ियों पर चढ़ें, डायनेमिक स्कोर पाकर 15 तक पहुँचें!</p>
+            <h2>Mine Island</h2>
+            <p>समुद्र तट पर चढ़ाई करें, 15 स्कोर पूरा करें!</p>
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
-            <div style="margin: 10px 0;">
-                <label style="font-size: 14px; color: #dfe6e9;">कैरेक्टर चुनें:</label><br>
-                <select id="charSelect" style="padding: 8px; width: 60%; margin-top: 5px; border-radius: 5px; background: #111827; color: #fff; border: 1px solid #00b894;">
-                    <option value="🐒">बंदर (Monkey)</option>
+            <div style="margin: 8px 0;">
+                <label style="font-size: 13px; color: #dfe6e9;">कैरेक्टर चुनें:</label><br>
+                <select id="charSelect" style="padding: 7px; width: 60%; margin-top: 4px; border-radius: 5px; background: #111827; color: #fff; border: 1px solid #f1c40f;">
+                    <option value="🦘">कंगारू (Kangaroo)</option>
                     <option value="🦊">लोमड़ी (Fox)</option>
                 </select>
             </div>
 
             <button class="action-btn" onclick="startGame()">गेम शुरू करें</button>
-            <p id="nameError" style="color: #ff6b6b; font-size: 13px;"></p>
+            <p id="nameError" style="color: #ff6b6b; font-size: 12px;"></p>
         </div>
 
         <!-- गेम खेलने की स्क्रीन -->
@@ -165,39 +167,41 @@
                 <span>🏆 स्कोर: <span id="scoreText">0</span>/15</span>
             </div>
 
-            <div class="message-box" id="instructionText">सही सीढ़ी पर छलांग लगाएँ!</div>
+            <div class="message-box" id="instructionText">बटन दबाकर छलांग लगाएं!</div>
             
             <div class="game-arena">
-                <div id="character">🐒</div>
-                <div class="stairs-container">
-                    <div class="stair" onclick="jumpToStair(0)">सीढ़ी 1</div>
-                    <div class="stair" onclick="jumpToStair(1)">सीढ़ी 2</div>
-                    <div class="stair" onclick="jumpToStair(2)">सीढ़ी 3</div>
-                    <div class="stair" onclick="jumpToStair(3)">सीढ़ी 4</div>
+                <!-- स्क्रीनशॉट जैसे 100x, 50x, 10x स्टेप्स -->
+                <div class="island-steps">
+                    <span class="step-badge">100x (उच्च स्तर)</span>
+                    <span class="step-badge">50x (मध्य स्तर)</span>
+                    <span class="step-badge">10x (प्रारंभिक स्तर)</span>
                 </div>
+                <div id="character">🦘</div>
             </div>
+
+            <!-- जंप बटन -->
+            <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
-        <!-- रिजल्ट स्क्रीन -->
+        <!-- रिजल्ट स्क्रीन (जीतने पर) -->
         <div id="resultScreen">
             <h2>गेम समाप्त!</h2>
-            <p id="finalResultMsg" style="font-size: 18px; font-weight: bold; margin: 15px 0;"></p>
+            <p id="finalResultMsg" style="font-size: 16px; font-weight: bold; margin: 12px 0;"></p>
             <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
         </div>
     </div>
 
     <script>
-        // आपका नया जोड़ा गया गूगल ऐप्स स्क्रिप्ट URL
         const scriptURL = "https://script.google.com/macros/s/AKfycbwKr3-nGqxHtODqv-gf5Hx_MtwmXgHL03Cw5RxUCHgFUw1n_W02SOtixct5Qa01RqnO5w/exec";
         
         let playerName = "";
-        let selectedEmoji = "🐒";
+        let selectedEmoji = "🦘";
         let score = 0;
-        let targetScore = 15; // फिक्स स्कोर टारगेट 15
-        let timeLeft = 60; // 1 मिनट का टाइमर
+        let targetScore = 15; 
+        let timeLeft = 60; 
         let timerInterval = null;
         let gameActive = false;
-        let safeStair = 0;
+        let currentPos = 15;
 
         function startGame() {
             let val = document.getElementById("usernameInput").value.trim();
@@ -208,71 +212,79 @@
             playerName = val;
             selectedEmoji = document.getElementById("charSelect").value;
             document.getElementById("character").innerText = selectedEmoji;
-            document.getElementById("character").style.bottom = "60px";
 
             document.getElementById("nameError").innerText = "";
             document.getElementById("nameScreen").style.display = "none";
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "block";
 
-            score = 0;
-            timeLeft = 60;
-            document.getElementById("scoreText").innerText = score;
-            document.getElementById("timerText").innerText = timeLeft;
-            
-            gameActive = true;
-            nextStep();
+            resetGameState();
+            startTimer();
+        }
 
-            // 1 मिनट का टाइमर चालू करें
+        function startTimer() {
+            gameActive = true;
+            clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById("timerText").innerText = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
+                    gameActive = false;
                     endGame("Loss", "⏰ समय समाप्त हो गया! आप हार गए।");
                 }
             }, 1000);
         }
 
-        function nextStep() {
-            if (!gameActive) return;
-            safeStair = Math.floor(Math.random() * 4);
-            document.getElementById("instructionText").innerText = "अगली सीढ़ी चुनें! पानी से बचें।";
+        function resetGameState() {
+            score = 0;
+            timeLeft = 60;
+            currentPos = 15;
+            document.getElementById("scoreText").innerText = score;
+            document.getElementById("timerText").innerText = timeLeft;
+            document.getElementById("character").style.bottom = currentPos + "px";
+            document.getElementById("character").innerText = selectedEmoji;
         }
 
-        function jumpToStair(chosenStair) {
+        function jumpAction() {
             if (!gameActive) return;
 
-            let positions = ["15%", "38%", "62%", "85%"];
-            document.getElementById("character").style.left = positions[chosenStair];
+            // 25% चांस पानी में पैर फिसलने का
+            let isSlip = Math.random() < 0.25; 
 
-            if (chosenStair === safeStair) {
-                // डाइनेमिक स्कोर: हर सही सीढ़ी पर 1 से 4 के बीच रैंडम अंक जुड़ेंगे
-                let earnedPoints = Math.floor(Math.random() * 4) + 1; 
-                score += earnedPoints;
-                
+            if (!isSlip) {
+                let earned = Math.floor(Math.random() * 3) + 1;
+                score += earned;
                 if (score > targetScore) score = targetScore;
 
                 document.getElementById("scoreText").innerText = score;
-                document.getElementById("instructionText").innerText = `✨ शानदार! +${earnedPoints} स्कोर मिला!`;
                 
+                currentPos += 22;
+                if (currentPos > 215) currentPos = 215;
+                document.getElementById("character").style.bottom = currentPos + "px";
+                document.getElementById("instructionText").innerText = `✨ शानदार! +${earned} स्कोर मिला।`;
+
                 if (score >= targetScore) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट पूरा कर लिया और जीत गए!");
-                } else {
-                    setTimeout(nextStep, 400);
+                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट पूरा करके जीत लिया!");
                 }
             } else {
-                // गलत सीढ़ी - पानी में गिर गया! गेम ओवर
+                // पैर फिसल गया -> पानी में गिर गया -> गेम ओवर और सीधे शुरुआत से रीसेट!
                 clearInterval(timerInterval);
                 gameActive = false;
-                
+
                 document.getElementById("character").style.bottom = "10px";
                 document.getElementById("character").innerText = "🌊";
-                
+                document.getElementById("instructionText").innerText = "💦 पैर फिसल गया और पानी में गिर गए!";
+
+                // तुरंत डेटा सर्वर पर 'Loss' भेजें और गेम को शुरुआत से दोबारा सेट करें
+                sendDataToServer("Loss");
+
                 setTimeout(() => {
-                    endGame("Loss", "💦 ओह नो! आप पानी में गिर गए! गेम ओवर।");
+                    alert("पानी में गिरने के कारण गेम ओवर! अब शुरुआत से दोबारा खेलें।");
+                    resetGameState();
+                    startTimer(); // टाइमर और गेम दोबारा 0 से चालू
                 }, 700);
             }
         }
