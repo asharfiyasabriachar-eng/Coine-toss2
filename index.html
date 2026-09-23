@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3799, #0984e3, #74b9ff);
+            background: linear-gradient(135deg, #1e3799, #0984e3);
             color: #fff;
             display: flex;
             justify-content: center;
@@ -18,11 +18,10 @@
         }
         .card {
             background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
             padding: 20px;
             border-radius: 20px;
-            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.8);
-            width: 400px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+            width: 380px;
             text-align: center;
             border: 3px solid #f1c40f;
         }
@@ -35,19 +34,19 @@
             text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
         }
         
-        /* स्क्रीनशॉट जैसा बीच और पानी का लुक */
+        /* स्क्रीनशॉट जैसा बीच और पानी का एरेना */
         .game-arena {
-            background: linear-gradient(to bottom, #74b9ff 45%, #e1b12c 45%);
+            background: linear-gradient(to bottom, #4aa3df 45%, #e1b12c 45%);
             border: 3px solid #f1c40f;
             border-radius: 12px;
-            height: 270px;
+            height: 260px;
             position: relative;
             margin: 15px 0;
             overflow: hidden;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* स्क्रीनशॉट जैसे मल्टीप्लायर स्टेप्स (10x, 50x, 100x) */
+        /* स्क्रीनशॉट जैसे 10x, 50x, 100x लेवल्स */
         .island-steps {
             position: absolute;
             width: 100%;
@@ -65,7 +64,7 @@
             padding: 4px 14px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             border: 2px solid #e17055;
         }
@@ -129,13 +128,27 @@
             font-size: 15px;
             outline: none;
         }
+        select {
+            padding: 8px;
+            width: 65%;
+            margin-top: 5px;
+            border-radius: 5px;
+            background: #111827;
+            color: #fff;
+            border: 1px solid #f1c40f;
+        }
         #gameScreen, #resultScreen { display: none; }
+        
+        /* सिर्फ स्क्रीन के अंदर दिखने वाला मैसेज बॉक्स */
         .message-box {
             font-size: 14px;
             font-weight: bold;
             margin: 5px 0;
             color: #ffeaa7;
             min-height: 20px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -150,7 +163,7 @@
             
             <div style="margin: 8px 0;">
                 <label style="font-size: 13px; color: #dfe6e9;">कैरेक्टर चुनें:</label><br>
-                <select id="charSelect" style="padding: 7px; width: 60%; margin-top: 4px; border-radius: 5px; background: #111827; color: #fff; border: 1px solid #f1c40f;">
+                <select id="charSelect">
                     <option value="🦘">कंगारू (Kangaroo)</option>
                     <option value="🦊">लोमड़ी (Fox)</option>
                 </select>
@@ -167,19 +180,18 @@
                 <span>🏆 स्कोर: <span id="scoreText">0</span>/15</span>
             </div>
 
+            <!-- यहाँ स्क्रीन के अंदर ही सारे मैसेज दिखेंगे -->
             <div class="message-box" id="instructionText">बटन दबाकर छलांग लगाएं!</div>
             
             <div class="game-arena">
-                <!-- स्क्रीनशॉट जैसे 100x, 50x, 10x स्टेप्स -->
                 <div class="island-steps">
-                    <span class="step-badge">100x (उच्च स्तर)</span>
-                    <span class="step-badge">50x (मध्य स्तर)</span>
-                    <span class="step-badge">10x (प्रारंभिक स्तर)</span>
+                    <span class="step-badge">100x (स्तर 3)</span>
+                    <span class="step-badge">50x (स्तर 2)</span>
+                    <span class="step-badge">10x (स्तर 1)</span>
                 </div>
                 <div id="character">🦘</div>
             </div>
 
-            <!-- जंप बटन -->
             <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
@@ -231,7 +243,7 @@
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Loss", "⏰ समय समाप्त हो गया! आप हार गए।");
+                    endGame("Loss", "⏰ समय समाप्त! आप हार गए।");
                 }
             }, 1000);
         }
@@ -244,13 +256,14 @@
             document.getElementById("timerText").innerText = timeLeft;
             document.getElementById("character").style.bottom = currentPos + "px";
             document.getElementById("character").innerText = selectedEmoji;
+            document.getElementById("instructionText").style.color = "#ffeaa7";
+            document.getElementById("instructionText").innerText = "बटन दबाकर छलांग लगाएं!";
         }
 
         function jumpAction() {
             if (!gameActive) return;
 
-            // 25% चांस पानी में पैर फिसलने का
-            let isSlip = Math.random() < 0.25; 
+            let isSlip = Math.random() < 0.25; // 25% चांस पानी में फिसलने का
 
             if (!isSlip) {
                 let earned = Math.floor(Math.random() * 3) + 1;
@@ -262,30 +275,31 @@
                 currentPos += 22;
                 if (currentPos > 215) currentPos = 215;
                 document.getElementById("character").style.bottom = currentPos + "px";
+                document.getElementById("instructionText").style.color = "#55efc4";
                 document.getElementById("instructionText").innerText = `✨ शानदार! +${earned} स्कोर मिला।`;
 
                 if (score >= targetScore) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट पूरा करके जीत लिया!");
+                    endGame("Winner", "🎉 बधाई हो! आपने 15 स्कोर का टारगेट जीत लिया!");
                 }
             } else {
-                // पैर फिसल गया -> पानी में गिर गया -> गेम ओवर और सीधे शुरुआत से रीसेट!
+                // पैर फिसल गया -> पानी में गिर गया -> बिना किसी पॉप-अप के सिर्फ स्क्रीन के अंदर मैसेज और रीसेट
                 clearInterval(timerInterval);
                 gameActive = false;
 
                 document.getElementById("character").style.bottom = "10px";
                 document.getElementById("character").innerText = "🌊";
-                document.getElementById("instructionText").innerText = "💦 पैर फिसल गया और पानी में गिर गए!";
+                document.getElementById("instructionText").style.color = "#ff6b6b";
+                document.getElementById("instructionText").innerText = "💦 पैर फिसल गया! पानी में गिरे, गेम शुरुआत से रीसेट हो रहा है...";
 
-                // तुरंत डेटा सर्वर पर 'Loss' भेजें और गेम को शुरुआत से दोबारा सेट करें
                 sendDataToServer("Loss");
 
+                // 1.5 सेकंड बाद चुपचाप गेम शुरुआत से दोबारा चालू हो जाएगा
                 setTimeout(() => {
-                    alert("पानी में गिरने के कारण गेम ओवर! अब शुरुआत से दोबारा खेलें।");
                     resetGameState();
-                    startTimer(); // टाइमर और गेम दोबारा 0 से चालू
-                }, 700);
+                    startTimer();
+                }, 1500);
             }
         }
 
