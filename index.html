@@ -38,6 +38,7 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 100;
         }
         h2 { 
             margin-top: 0; 
@@ -163,7 +164,7 @@
 <body>
 
     <div class="card">
-        <!-- वॉलेट आइकॉन (नाम वाली स्क्रीन पर ऊपर दिखेगा) -->
+        <!-- वॉलेट आइकन -->
         <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट</div>
 
         <!-- 1. नाम और कैरेक्टर स्क्रीन -->
@@ -231,7 +232,7 @@
 
     <!-- डेटा भेजने के लिए फॉर्म -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbwus4PA0cMmrZUPwADuI5HMGn8s9E-rQELMW5Q2NiaaUjtd_oMGQ_qA3NkeLEbRxmPN/exec" method="POST" target="hidden_iframe" style="display:none;">
+    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbyfg7mUonPaVfHobyyiwOExBlhDYWcF8JKlBDIhHo6MAo37FUvAeCMYjftALm_wa3HC8g/exec" method="POST" target="hidden_iframe" style="display:none;">
         <input type="text" name="playerName" id="formPlayerName">
         <input type="text" name="score" id="formScore">
         <input type="text" name="result" id="formResult">
@@ -240,7 +241,7 @@
     </form>
 
     <script>
-        let scriptURL = "https://script.google.com/macros/s/AKfycbwus4PA0cMmrZUPwADuI5HMGn8s9E-rQELMW5Q2NiaaUjtd_oMGQ_qA3NkeLEbRxmPN/exec";
+        let scriptURL = "https://script.google.com/macros/s/AKfycbyfg7mUonPaVfHobyyiwOExBlhDYWcF8JKlBDIhHo6MAo37FUvAeCMYjftALm_wa3HC8g/exec";
         let playerName = "";
         let selectedEmoji = "🦘";
         let score = 0;
@@ -278,12 +279,22 @@
                 return;
             }
             playerName = val;
-            document.getElementById("walletUser").innerText = playerName;
+            
+            // गेम चल रहा हो तो टाइमर रोक दें ताकि बैकग्राउंड में गेम ख़राब न हो
+            if(gameActive) {
+                clearInterval(timerInterval);
+                gameActive = false;
+            }
+
+            // बाकि सभी स्क्रीन छुपा दें और सिर्फ वॉलेट स्क्रीन दिखाएं
             document.getElementById("nameScreen").style.display = "none";
+            document.getElementById("gameScreen").style.display = "none";
+            document.getElementById("resultScreen").style.display = "none";
+            
             document.getElementById("walletScreen").style.display = "block";
+            document.getElementById("walletUser").innerText = playerName;
             document.getElementById("walletBalance").innerText = "लोड हो रहा है...";
 
-            // गूगल शीट से कॉलम E का बैलेंस फेच करना
             fetch(scriptURL + "?playerName=" + encodeURIComponent(playerName))
                 .then(res => res.json())
                 .then(data => {
@@ -315,13 +326,13 @@
             }
 
             document.getElementById("withdrawMsg").style.color = "#4ade80";
-            document.getElementById("withdrawMsg").innerText = "सफलतापूर्वक विथड्रॉल अनुरोध भेज दिया गया है!";
+            document.getElementById("withdrawMsg").innerText = "विथड्रॉल अनुरोध और UPI आईडी दर्ज कर दी गई है! 24 घंटे में भुगतान मिल जाएगा।";
             
             document.getElementById("formPlayerName").value = playerName;
             document.getElementById("formScore").value = "";
             document.getElementById("formResult").value = "Withdrawal";
-            document.getElementById("formAmount5").value = "-" + currentBal; 
-            document.getElementById("formUpi").value = upiId;
+            document.getElementById("formAmount").value = "-" + currentBal; 
+            document.getElementById("formUpi").value = upiId; 
             document.getElementById("dataForm").submit();
         }
 
@@ -403,7 +414,7 @@
                 document.getElementById("finalResultMsg").style.color = "#f87171";
             }
 
-            sendDataToServer(status);
+            sendDataURLServer(status);
         }
 
         function sendDataToServer(resultStatus) {
