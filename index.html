@@ -182,7 +182,7 @@
             </div>
 
             <button class="action-btn" onclick="startGame()">गेम शुरू करें</button>
-            <p id="nameError" style="color: #f87171; font-size: 11px; margin-top: 5px;"></p>
+            <p id="nameError" style="color: #f87171; font-size: 12px; margin-top: 6px; font-weight: bold;"></p>
         </div>
 
         <!-- 2. गेम स्क्रीन -->
@@ -256,7 +256,7 @@
         function startGame() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
-                document.getElementById("nameError").innerText = "कृपया अपना नाम लिखें!";
+                document.getElementById("nameErrorinnerText" || "nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
                 return;
             }
             playerName = val;
@@ -275,18 +275,18 @@
         function openWallet() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
-                alert("कृपया पहले अपना नाम दर्ज करें!");
+                // पॉपअप की जगह अब स्क्रीन पर ही लाल रंग में एरर मैसेज दिखेगा
+                document.getElementById("nameError").innerText = "⚠️ कृपया वॉलेट देखने के लिए पहले नाम दर्ज करें!";
                 return;
             }
             playerName = val;
+            document.getElementById("nameError").innerText = "";
             
-            // गेम चल रहा हो तो टाइमर रोक दें ताकि बैकग्राउंड में गेम ख़राब न हो
             if(gameActive) {
                 clearInterval(timerInterval);
                 gameActive = false;
             }
 
-            // बाकि सभी स्क्रीन छुपा दें और सिर्फ वॉलेट स्क्रीन दिखाएं
             document.getElementById("nameScreen").style.display = "none";
             document.getElementById("gameScreen").style.display = "none";
             document.getElementById("resultScreen").style.display = "none";
@@ -414,7 +414,7 @@
                 document.getElementById("finalResultMsg").style.color = "#f87171";
             }
 
-            sendDataURLServer(status);
+            sendDataToServer(status);
         }
 
         function sendDataToServer(resultStatus) {
