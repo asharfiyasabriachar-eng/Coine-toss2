@@ -185,7 +185,7 @@
 
     <!-- Google Sheet में डेटा भेजने के लिए गुप्त फॉर्म (Hidden Form) -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbwsOJAhxSsoPZ8ziesGdt-MSsSDoWCVGUbQjYf9pOoVW2Fesh84yW0Fj2-5j6XezfnYDQ/exec" method="POST" target="hidden_iframe" style="display:none;">
+    <form id="dataForm" action="https://script.google.com/macros/s/AKfycbyWDaUcB6-DK68dSa81tq0O9XhM_nRJXKJpWajYCEoP24OiHz83X8kuOUVkooNhD6hUkw/exec" method="POST" target="hidden_iframe" style="display:none;">
         <input type="text" name="playerName" id="formPlayerName">
         <input type="text" name="result" id="formResult">
     </form>
@@ -251,7 +251,7 @@
             let isSlip = Math.random() < 0.25; 
 
             if (!isSlip) {
-                let earned = Math.floor(Math.random() * 3) + 1;
+                let earned = Math.floor(Math.random() * 3) + 1; // कभी 1, कभी 2, कभी 3 स्कोर
                 score += earned;
                 if (score > targetScore) score = targetScore;
 
@@ -302,7 +302,6 @@
         }
 
         function sendDataToServer(resultStatus) {
-            // फॉर्म में वैल्यू भरकर सीधे सबमिट करने का अचूक तरीका
             document.getElementById("formPlayerName").value = playerName;
             document.getElementById("formResult").value = resultStatus;
             document.getElementById("dataForm").submit();
