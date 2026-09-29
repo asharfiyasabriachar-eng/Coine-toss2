@@ -26,7 +26,6 @@
             border: 3px solid #facc15;
             position: relative;
         }
-        /* वॉलेट बटन को अब बीच में और सुंदर बना दिया गया है ताकि स्कोर न छुप सके */
         .wallet-btn-container {
             margin-bottom: 12px;
         }
@@ -171,7 +170,6 @@
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
             
-            <!-- वॉलेट बटन को अब यहाँ बीच में व्यवस्थित किया गया है -->
             <div class="wallet-btn-container">
                 <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट देखें</div>
             </div>
@@ -369,7 +367,8 @@
         function jumpAction() {
             if (!gameActive) return;
 
-            let isSlip = Math.random() < 0.25; 
+            // यहाँ स्लिप होने का चांस 20% (0.20) कर दिया गया है
+            let isSlip = Math.random() < 0.20; 
 
             if (!isSlip) {
                 let earned = Math.floor(Math.random() * 3) + 1; 
