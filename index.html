@@ -26,19 +26,21 @@
             border: 3px solid #facc15;
             position: relative;
         }
+        /* वॉलेट बटन को अब बीच में और सुंदर बना दिया गया है ताकि स्कोर न छुप सके */
+        .wallet-btn-container {
+            margin-bottom: 12px;
+        }
         .wallet-icon {
-            position: absolute;
-            top: 15px;
-            right: 18px;
+            display: inline-block;
             background: #facc15;
             color: #020617;
-            padding: 6px 12px;
+            padding: 8px 18px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 2px solid #ca8a04;
         }
         h2 { 
             margin-top: 0; 
@@ -164,13 +166,16 @@
 <body>
 
     <div class="card">
-        <!-- वॉलेट आइकन -->
-        <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट</div>
-
         <!-- 1. नाम और कैरेक्टर स्क्रीन -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
+            
+            <!-- वॉलेट बटन को अब यहाँ बीच में व्यवस्थित किया गया है -->
+            <div class="wallet-btn-container">
+                <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट देखें</div>
+            </div>
+
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
             <div style="margin: 8px 0;">
@@ -256,7 +261,7 @@
         function startGame() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
-                document.getElementById("nameErrorinnerText" || "nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
+                document.getElementById("nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
                 return;
             }
             playerName = val;
@@ -275,7 +280,6 @@
         function openWallet() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
-                // पॉपअप की जगह अब स्क्रीन पर ही लाल रंग में एरर मैसेज दिखेगा
                 document.getElementById("nameError").innerText = "⚠️ कृपया वॉलेट देखने के लिए पहले नाम दर्ज करें!";
                 return;
             }
