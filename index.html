@@ -176,7 +176,7 @@
 <body>
 
     <div class="card">
-        <!-- होम / एंट्री स्क्रीन (नए यूजर के लिए नाम बॉक्स दिखेगा, पुराने के लिए छिप जाएगा) -->
+        <!-- होम / एंट्री स्क्रीन -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
@@ -185,7 +185,6 @@
                 <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट देखें</div>
             </div>
 
-            <!-- यह इनपुट बॉक्स और नोट सिर्फ नए यूजर को दिखेगा -->
             <div id="newUserBox">
                 <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
                 <div class="notice-box">
@@ -278,15 +277,12 @@
         let gameActive = false;
         let currentPos = 15;
 
-        // ऐप खुलते ही चेक करें कि क्या यूजर का नाम पहले से सेव है
         window.onload = function() {
             let savedName = localStorage.getItem("mine_island_username");
             if (savedName) {
                 playerName = savedName;
-                // अगर पुराना यूजर है, तो नाम वाला इनपुट बॉक्स और नोट पूरी तरह छुपा दें
                 document.getElementById("newUserBox").style.display = "none";
             } else {
-                // नए यूजर के लिए इनपुट बॉक्स दिखाई देगा
                 document.getElementById("newUserBox").style.display = "block";
             }
         };
@@ -295,7 +291,6 @@
             let savedName = localStorage.getItem("mine_island_username");
             
             if (!savedName) {
-                // अगर नया यूजर है, तो इनपुट से नाम लें और सेव करें
                 let val = document.getElementById("usernameInput").value.trim();
                 if (!val) {
                     document.getElementById("nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
@@ -304,7 +299,6 @@
                 playerName = val;
                 localStorage.setItem("mine_island_username", playerName);
             } else {
-                // अगर पुराना यूजर है, तो पहले से सेव नाम का इस्तेमाल करें
                 playerName = savedName;
             }
 
@@ -349,13 +343,20 @@
             document.getElementById("walletUser").innerText = playerName;
             document.getElementById("walletBalance").innerText = "लोड हो रहा है...";
 
+            // सर्वर एरर (500/505) से बचाने के लिए सुरक्षित कोडिंग
             fetch(scriptURL + "?playerName=" + encodeURIComponent(playerName))
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("Server error: " + res.status);
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    document.getElementById("walletBalance").innerText = data.balance;
+                    document.getElementById("walletBalance").innerText = data.balance !== undefined ? data.balance : "0";
                 })
                 .catch(err => {
-                    document.getElementById("walletBalance").innerText = "0";
+                    console.error("Wallet fetch error:", err);
+                    document.getElementById("walletBalance").innerText = "0"; // एरर आने पर ऐप क्रैश नहीं होगा, ₹0 दिखाएगा
                 });
         }
 
@@ -368,7 +369,6 @@
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("nameScreen").style.display = "block";
             
-            // होम पर लौटने पर फिर से चेक करें कि पुराना यूजर है तो इनपुट बॉक्स छुपा रहे
             let savedName = localStorage.getItem("mine_island_username");
             if (savedName) {
                 document.getElementById("newUserBox").style.display = "none";
@@ -404,7 +404,7 @@
         function jumpAction() {
             if (!gameActive) return;
 
-            let isSlip = Math.random() < 0.25; 
+            let isSlip = Math.random() < 0.20; 
 
             if (!isSlip) {
                 let earned = Math.floor(Math.random() * 3) + 1; 
