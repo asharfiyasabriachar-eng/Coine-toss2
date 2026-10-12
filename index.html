@@ -176,7 +176,7 @@
 <body>
 
     <div class="card">
-        <!-- 1. नाम और कैरेक्टर स्क्रीन -->
+        <!-- होम / एंट्री स्क्रीन (नए यूजर के लिए नाम बॉक्स दिखेगा, पुराने के लिए छिप जाएगा) -->
         <div id="nameScreen">
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
@@ -185,10 +185,12 @@
                 <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट देखें</div>
             </div>
 
-            <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
-            
-            <div class="notice-box">
-                💡 <b>जरूरी नोट:</b> वॉलेट में जीतने की राशि देखने के लिए वही नाम दर्ज करें जिससे गेम खेला था। स्पेलिंग मिस्टेक न हो!
+            <!-- यह इनपुट बॉक्स और नोट सिर्फ नए यूजर को दिखेगा -->
+            <div id="newUserBox">
+                <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
+                <div class="notice-box">
+                    💡 <b>जरूरी नोट:</b> वॉलेट में जीतने की राशि देखने के लिए वही नाम दर्ज करें जिससे गेम खेला था। स्पेलिंग मिस्टेक न हो!
+                </div>
             </div>
 
             <div style="margin: 8px 0;">
@@ -229,8 +231,7 @@
             <h2 id="resultTitle">गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 15px; font-weight: bold; margin: 12px 0;"></p>
             
-            <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
-            <button class="action-btn back-btn" onclick="goToHome()">वापस जाएं (Home)</button>
+            <button class="action-btn" onclick="restartGame()">होम पर जाएं (Home)</button>
         </div>
 
         <!-- 4. वॉलेट स्क्रीन -->
@@ -243,7 +244,7 @@
             </div>
 
             <div class="notice-box">
-                ⚠️ <b>ध्यान दें:</b> यदि आप दूसरा नाम डालेंगे या स्पेलिंग गलत होगी, तो जीतने की राशि नहीं दिखेगी। वही नाम डालें जिससे गेम खेला था!
+                ⚠️ सुरक्षित खाता: आपका यह वॉलेट आपके परमानेंट नाम से जुड़ा है।
             </div>
 
             <input type="text" id="upiInput" placeholder="अपनी UPI ID दर्ज करें (उदा: paytm@ybl)">
@@ -277,25 +278,35 @@
         let gameActive = false;
         let currentPos = 15;
 
-        // ऐप खुलते ही चेक करें कि क्या नाम पहले से सेव है
+        // ऐप खुलते ही चेक करें कि क्या यूजर का नाम पहले से सेव है
         window.onload = function() {
             let savedName = localStorage.getItem("mine_island_username");
             if (savedName) {
-                document.getElementById("usernameInput").value = savedName;
                 playerName = savedName;
+                // अगर पुराना यूजर है, तो नाम वाला इनपुट बॉक्स और नोट पूरी तरह छुपा दें
+                document.getElementById("newUserBox").style.display = "none";
+            } else {
+                // नए यूजर के लिए इनपुट बॉक्स दिखाई देगा
+                document.getElementById("newUserBox").style.display = "block";
             }
         };
 
         function startGame() {
-            let val = document.getElementById("usernameInput").value.trim();
-            if (!val) {
-                document.getElementById("nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
-                return;
-            }
-            playerName = val;
+            let savedName = localStorage.getItem("mine_island_username");
             
-            // नाम को मोबाइल में हमेशा के लिए सेव कर लें
-            localStorage.setItem("mine_island_username", playerName);
+            if (!savedName) {
+                // अगर नया यूजर है, तो इनपुट से नाम लें और सेव करें
+                let val = document.getElementById("usernameInput").value.trim();
+                if (!val) {
+                    document.getElementById("nameError").innerText = "⚠️ कृपया पहले अपना नाम दर्ज करें!";
+                    return;
+                }
+                playerName = val;
+                localStorage.setItem("mine_island_username", playerName);
+            } else {
+                // अगर पुराना यूजर है, तो पहले से सेव नाम का इस्तेमाल करें
+                playerName = savedName;
+            }
 
             selectedEmoji = document.getElementById("charSelect").value;
             document.getElementById("character").innerText = selectedEmoji;
@@ -310,13 +321,19 @@
         }
 
         function openWallet() {
-            let val = document.getElementById("usernameInput").value.trim();
-            if (!val) {
-                document.getElementById("nameError").innerText = "⚠️ कृपया वॉलेट देखने के लिए पहले नाम दर्ज करें!";
-                return;
+            let savedName = localStorage.getItem("mine_island_username");
+            if (!savedName) {
+                let val = document.getElementById("usernameInput").value.trim();
+                if (!val) {
+                    document.getElementById("nameError").innerText = "⚠️ कृपया वॉलेट देखने के लिए पहले नाम दर्ज करें!";
+                    return;
+                }
+                playerName = val;
+                localStorage.setItem("mine_island_username", playerName);
+            } else {
+                playerName = savedName;
             }
-            playerName = val;
-            localStorage.setItem("mine_island_username", playerName);
+
             document.getElementById("nameError").innerText = "";
             
             if(gameActive) {
@@ -347,35 +364,15 @@
             document.getElementById("nameScreen").style.display = "block";
         }
 
-        function goToHome() {
+        function restartGame() {
             document.getElementById("resultScreen").style.display = "none";
             document.getElementById("nameScreen").style.display = "block";
-        }
-
-        function requestWithdrawal() {
-            let upiId = document.getElementById("upiInput").value.trim();
-            let currentBal = parseFloat(document.getElementById("walletBalance").innerText) || 0;
             
-            if (!upiId) {
-                document.getElementById("withdrawMsg").style.color = "#f87171";
-                document.getElementById("withdrawMsg").innerText = "कृपया सही UPI ID लिखें!";
-                return;
+            // होम पर लौटने पर फिर से चेक करें कि पुराना यूजर है तो इनपुट बॉक्स छुपा रहे
+            let savedName = localStorage.getItem("mine_island_username");
+            if (savedName) {
+                document.getElementById("newUserBox").style.display = "none";
             }
-            if (currentBal <= 0) {
-                document.getElementById("withdrawMsg").style.color = "#f87171";
-                document.getElementById("withdrawMsg").innerText = "विथड्रॉल के लिए बैलेंस नहीं है!";
-                return;
-            }
-
-            document.getElementById("withdrawMsg").style.color = "#4ade80";
-            document.getElementById("withdrawMsg").innerText = "विथड्रॉल अनुरोध और UPI आईडी दर्ज कर दी गई है! 24 घंटे में भुगतान मिल जाएगा।";
-            
-            document.getElementById("formPlayerName").value = playerName;
-            document.getElementById("formScore").value = "";
-            document.getElementById("formResult").value = "Withdrawal";
-            document.getElementById("formAmount").value = "-" + currentBal; 
-            document.getElementById("formUpi").value = upiId; 
-            document.getElementById("dataForm").submit();
         }
 
         function startTimer() {
@@ -467,11 +464,6 @@
             document.getElementById("formAmount").value = "0"; 
             document.getElementById("formUpi").value = "";
             document.getElementById("dataForm").submit();
-        }
-
-        function restartGame() {
-            document.getElementById("resultScreen").style.display = "none";
-            document.getElementById("nameScreen").style.display = "block";
         }
     </script>
 </body>
