@@ -224,17 +224,16 @@
             <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
-        <!-- 3. रिजल्ट स्क्रीन (हारने या जीतने पर) -->
+        <!-- 3. रिजल्ट स्क्रीन -->
         <div id="resultScreen">
             <h2 id="resultTitle">गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 15px; font-weight: bold; margin: 12px 0;"></p>
             
             <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
-            <!-- यहाँ 'वापस जाएं' बटन जोड़ दिया गया है -->
             <button class="action-btn back-btn" onclick="goToHome()">वापस जाएं (Home)</button>
         </div>
 
-        <!-- 4. वॉलेट और विथड्रॉल स्क्रीन -->
+        <!-- 4. वॉलेट स्क्रीन -->
         <div id="walletScreen">
             <h2>माय वॉलेट 💰</h2>
             <div class="wallet-box">
@@ -278,6 +277,15 @@
         let gameActive = false;
         let currentPos = 15;
 
+        // ऐप खुलते ही चेक करें कि क्या नाम पहले से सेव है
+        window.onload = function() {
+            let savedName = localStorage.getItem("mine_island_username");
+            if (savedName) {
+                document.getElementById("usernameInput").value = savedName;
+                playerName = savedName;
+            }
+        };
+
         function startGame() {
             let val = document.getElementById("usernameInput").value.trim();
             if (!val) {
@@ -285,6 +293,10 @@
                 return;
             }
             playerName = val;
+            
+            // नाम को मोबाइल में हमेशा के लिए सेव कर लें
+            localStorage.setItem("mine_island_username", playerName);
+
             selectedEmoji = document.getElementById("charSelect").value;
             document.getElementById("character").innerText = selectedEmoji;
 
@@ -304,6 +316,7 @@
                 return;
             }
             playerName = val;
+            localStorage.setItem("mine_island_username", playerName);
             document.getElementById("nameError").innerText = "";
             
             if(gameActive) {
@@ -453,7 +466,6 @@
             document.getElementById("formResult").value = resultStatus; 
             document.getElementById("formAmount").value = "0"; 
             document.getElementById("formUpi").value = "";
-            document.getElementById("dataForm".submit?.() || "dataForm"); // Safe execution
             document.getElementById("dataForm").submit();
         }
 
