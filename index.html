@@ -26,7 +26,6 @@
             border: 3px solid #facc15;
             position: relative;
         }
-        /* वॉलेट बटन को अब बीच में और सुंदर बना दिया गया है ताकि स्कोर न छुप सके */
         .wallet-btn-container {
             margin-bottom: 12px;
         }
@@ -161,6 +160,17 @@
             margin: 8px 0;
             border: 1px dashed #facc15;
         }
+        .notice-box {
+            background: rgba(250, 204, 21, 0.15);
+            border: 1px solid #facc15;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #fde047;
+            margin: 8px 0;
+            text-align: left;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -171,13 +181,16 @@
             <h2>Mine Island</h2>
             <p style="font-size: 13px; color: #94a3b8;">समुद्र तट से छलांग लगाएं, टारगेट जीतें!</p>
             
-            <!-- वॉलेट बटन को अब यहाँ बीच में व्यवस्थित किया गया है -->
             <div class="wallet-btn-container">
                 <div class="wallet-icon" onclick="openWallet()">💰 वॉलेट देखें</div>
             </div>
 
             <input type="text" id="usernameInput" placeholder="अपना नाम दर्ज करें">
             
+            <div class="notice-box">
+                💡 <b>जरूरी नोट:</b> वॉलेट में जीतने की राशि देखने के लिए वही नाम दर्ज करें जिससे गेम खेला था। स्पेलिंग मिस्टेक न हो!
+            </div>
+
             <div style="margin: 8px 0;">
                 <label style="font-size: 12px; color: #94a3b8;">कैरेक्टर चुनें:</label><br>
                 <select id="charSelect">
@@ -211,11 +224,14 @@
             <button class="action-btn jump-btn" onclick="jumpAction()">🚀 छलांग लगाएं (Jump)</button>
         </div>
 
-        <!-- 3. रिजल्ट स्क्रीन -->
+        <!-- 3. रिजल्ट स्क्रीन (हारने या जीतने पर) -->
         <div id="resultScreen">
-            <h2>गेम समाप्त!</h2>
+            <h2 id="resultTitle">गेम समाप्त!</h2>
             <p id="finalResultMsg" style="font-size: 15px; font-weight: bold; margin: 12px 0;"></p>
+            
             <button class="action-btn" onclick="restartGame()">फिर से खेलें (Play Again)</button>
+            <!-- यहाँ 'वापस जाएं' बटन जोड़ दिया गया है -->
+            <button class="action-btn back-btn" onclick="goToHome()">वापस जाएं (Home)</button>
         </div>
 
         <!-- 4. वॉलेट और विथड्रॉल स्क्रीन -->
@@ -225,6 +241,10 @@
                 <p style="margin: 3px 0; font-size: 13px; color: #94a3b8;">खिलाड़ी: <span id="walletUser" style="color:#fff; font-weight:bold;">-</span></p>
                 <p style="margin: 3px 0; font-size: 13px;">कुल उपलब्ध बैलेंस:</p>
                 <h3 style="color: #4ade80; margin: 5px 0; font-size: 24px;">₹ <span id="walletBalance">0</span></h3>
+            </div>
+
+            <div class="notice-box">
+                ⚠️ <b>ध्यान दें:</b> यदि आप दूसरा नाम डालेंगे या स्पेलिंग गलत होगी, तो जीतने की राशि नहीं दिखेगी। वही नाम डालें जिससे गेम खेला था!
             </div>
 
             <input type="text" id="upiInput" placeholder="अपनी UPI ID दर्ज करें (उदा: paytm@ybl)">
@@ -314,6 +334,11 @@
             document.getElementById("nameScreen").style.display = "block";
         }
 
+        function goToHome() {
+            document.getElementById("resultScreen").style.display = "none";
+            document.getElementById("nameScreen").style.display = "block";
+        }
+
         function requestWithdrawal() {
             let upiId = document.getElementById("upiInput").value.trim();
             let currentBal = parseFloat(document.getElementById("walletBalance").innerText) || 0;
@@ -349,7 +374,7 @@
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     gameActive = false;
-                    endGame("Loss", "⏰ समय समाप्त! आप हार गए।");
+                    endGame("Loss", "❌ आप हार गए! समय समाप्त हो गया है।");
                 }
             }, 1000);
         }
@@ -400,9 +425,8 @@
                 sendDataToServer("Loss");
 
                 setTimeout(() => {
-                    resetGameState();
-                    startTimer();
-                }, 1500);
+                    endGame("Loss", "❌ आप हार गए! पैर फिसलने के कारण खेल समाप्त हुआ।");
+                }, 1000);
             }
         }
 
@@ -413,8 +437,10 @@
             document.getElementById("finalResultMsg").innerText = msg;
             
             if (status === "Winner") {
+                document.getElementById("resultTitle").innerText = "जीत गए! 🏆";
                 document.getElementById("finalResultMsg").style.color = "#4ade80";
             } else {
+                document.getElementById("resultTitle").innerText = "हार गए! ❌";
                 document.getElementById("finalResultMsg").style.color = "#f87171";
             }
 
@@ -427,6 +453,7 @@
             document.getElementById("formResult").value = resultStatus; 
             document.getElementById("formAmount").value = "0"; 
             document.getElementById("formUpi").value = "";
+            document.getElementById("dataForm".submit?.() || "dataForm"); // Safe execution
             document.getElementById("dataForm").submit();
         }
 
